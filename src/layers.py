@@ -69,17 +69,11 @@ def relu_backward(dout, X):
 
     Returns: Derivative with respect to X
     """
-    dX = None
 
-    ###########################################################################
-    #                           BEGIN OF YOUR CODE                            #
-    ###########################################################################
-
-
-    ###########################################################################
-    #                            END OF YOUR CODE                             #
-    ###########################################################################
-    return dX
+    out = X.copy()     # Must use copy to avoid pass by reference
+    out[out <  0] = 0
+    out[out >= 0] = 1
+    return out * dout
 
 
 def dropout_forward(X, p=0.5, train=True, seed=42):
