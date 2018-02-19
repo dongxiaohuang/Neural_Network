@@ -1,6 +1,6 @@
 import numpy as np
 
-def softmax(logits, y):
+def softmax (logits, y):
     """
     Computes the loss and gradient for softmax classification.
 
@@ -17,9 +17,9 @@ def softmax(logits, y):
 
     X -= X.max(axis = 1, keepdims = True)     # For numerical stability
     prob = np.exp(X)                          # Unnormalized probabilities
-    prob /= prob.sum(axis = 1, keepdims = True)     # Rows sum to 1
+    prob /= prob.sum(axis = 1, keepdims = True)     # Each row sums to 1
     loss = np.log(prob)
-    loss = loss[np.arange(len(loss)), y].sum()
+    loss = loss[np.arange(len(loss)), y].mean()
 
     dlogits = None
 
