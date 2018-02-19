@@ -10,29 +10,16 @@ def linear_forward(X, W, b):
     vector of dimension M.
 
     Args:
-    - X: A numpy array of shape (N, d_1, ..., d_K) incoming data
-    - W: Anumpy array of shape (D, M) of weights, with D = d_1 * ... * d_K
-    - b: A numpy array of shape (M, ) of biases
+    - X: NumPy array of shape (N, d_1, ..., d_K) incoming data
+    - W: NumPy array of shape (D, M) of weights, with D = d_1 * ... * d_K
+    - b: NumPy array of shape (M, ) of biases
 
-    Returns:
-    - out: linear transformation to the incoming data
+    Returns: Linear transformation to the incoming data
     """
-    out = None
-    """
-    TODO: Implemenp.prod(X.shape[1:])nt the linear forward pass. Store your result in `out`.
-    Tip: Think how X needs to be reshaped.
-    """
-    ###########################################################################
-    #                           BEGIN OF YOUR CODE                            #
-    #######################nv ####################################################
 
     N = X.shape[0]
     D = np.prod(X.shape[1:])
-    out = np.dot(X.reshape(N, D), W) + b
-    ###########################################################################
-    #                            END OF YOUR Csigmoid(ODE                             #
-    #############np.prod(X.shape[1:])##############################################################
-    return out
+    return np.dot(X.reshape(N, D), W) + b
 
 
 def linear_backward(dout, X, W, b):
@@ -41,72 +28,49 @@ def linear_backward(dout, X, W, b):
 
     Args:
     - dout: Upstream derivative, of shape (N, M)
-    - X: A numpy array of shape (N, d_1, ..., d_K) incoming data
-    - W: A numpy array of shape (D, M) of weights, with D= d_1 * ... * d_K
-    - b: A numpy array of shape (M, ) of biases
+    - X: NumPy array of shape (N, d_1, ..., d_K) incoming data
+    - W: NumPy array of shape (D, M) of weights, with D = d_1 * ... * d_K
+    - b: NumPy array of shape (M, ) of biases
 
     Returns (as tuple):
-    - dX: A numpy array of shape (N, d_1, ..., d_K), gradient with respect to x
-    - dW: A numpy array of shape (D, M), gradient with respect to W
-    - db: A nump array of shape (M,), gradient with respect to b
+    - dX: NumPy array of shape (N, d_1, ..., d_K), gradient with respect to X
+    - dW: NumPy array of shape (D, M), gradient with respect to W
+    - db: NumPy array of shape (M,), gradient with respect to b
     """
-    dX, dW, db = None, None, None
-    """
-    TODO: Implement the linear backward pass. Store your results of the
-    gradients in `dX`, `dW`, `db`.
-    """
-    ###########################################################################
-    #                           BEGIN OF YOUR CODE                            #
-    ###########################################################################
+
     N = X.shape[0]
     D = W.shape[0]
     dX = np.dot(dout, W.T).reshape(X.shape)
     dW = np.dot(X.reshape(N, D).T, dout)
     db = dout.sum(axis = 0)
-
-    ###########################################################################
-    #                            END OF YOUR CODE                             #
-    ###########################################################################
-
     return dX, dW, db
 
 
 def relu_forward(X):
     """
     Computes the forward pass for rectified linear unit (ReLU) layer.
+
     Args:
-    - X: Input, an numpy array of any shape
-    Returns:
-    - out: An numpy array, same shape as X
+    - X: NumPy array of any shape
     """
-    out = None
-    """
-    TODO: Implement the ReLU forward pass. Store your result in out.
-    """
-    ###########################################################################
-    #                           BEGIN OF YOUR CODE                            #
-    ###########################################################################
-    out = X.copy()  # Must use copy in numpy to avoid pass by reference.
+
+    out = X.copy()     # Must use copy to avoid pass by reference
     out[out < 0] = 0
-    ###########################################################################
-    #                            END OF YOUR CODE                             #
-    ###########################################################################
     return out
 
 
 def relu_backward(dout, X):
     """
     Computes the backward pass for rectified linear unit (ReLU) layer.
+
     Args:
-    - dout: Upstream derivative, an numpy array of any shape
-    - X: Input, an numpy array with the same shape as dout
-    Returns:
-    - dX: A numpy array, derivative with respect to X
+    - dout: Upstream derivative, a NumPy array of any shape
+    - X: NumPy array with the same shape as dout
+
+    Returns: Derivative with respect to X
     """
     dX = None
-    """
-    TODO: Implement the ReLU backward pass. Store your result in out.
-    """
+
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
@@ -124,7 +88,7 @@ def dropout_forward(X, p=0.5, train=True, seed=42):
     Args:
     - X: Input data, a numpy array of any shape.
     - p: Dropout parameter. We drop each neuron output with probability p.
-    Default is p=0.5.
+    Default is p = 0.5.
     - train: Mode of dropout. If train is True, then perform dropout;
       Otherwise train is False (= test mode). Default is train=True.
 
