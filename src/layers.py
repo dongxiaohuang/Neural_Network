@@ -102,16 +102,15 @@ def dropout_forward(X, p=0.5, train=True, seed=42):
     ###########################################################################
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
-    if(train):
-        mask = np.random.binomial(1, p, X.shape)
-        out = mask * X
+    if train:
+        mask = np.random.binomial(1, 1-p, X.shape)/(1-p)
+        out = X * mask
     else:
-        out = (1-p)*X
-    #how to be tuple
+        out = X
     ###########################################################################
     #                            END OF YOUR CODE                             #
     ###########################################################################
-    return (out, mask)
+    return out, mask
 
 
 def dropout_backward(dout, mask, p=0.5, train=True):
@@ -138,7 +137,7 @@ def dropout_backward(dout, mask, p=0.5, train=True):
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
     if train:
-        dX = dout*mask*(1/(1.0-p))
+        dX = dout * mask
     else:
         dX = dout
     ###########################################################################
