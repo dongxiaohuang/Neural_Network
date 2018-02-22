@@ -14,15 +14,17 @@ def softmax (logits, y):
     - loss: Loss scalar
     - dlogits: Loss gradient with respect to logits
     """
+    loss, dlogits = None, None
 
-    X -= logits.max(axis = 1, keepdims = True)     # For numerical stability
-    sigma_z = np.exp(X)                          # Unnormalized probabilities
-    sigma_z /= prob.sum(axis = 1, keepdims = True)     # Each row sums to 1
-    lg_sigma_z = np.log(prob)
-    # for i in range(len(y)):
-    #     loss -= lg_sigma_z[y[i]]
-    loss -= lg_sigma_z[range(len(y)),y]
-    dlogits = sigma_z[range(len(y)),y]-1
+    n = y.shape[0]
+    X = -logits.max(axis = 1, keepdims = True)     # For numerical stability
+    sigma_z = np.exp(logits + X)                          # Unnormalized probabilities
+    sigma_z /= sigma_z.sum(axis = 1, keepdims = True)     # Each row sums to 1
+    lg_sigma_z = np.log(sigma_z)
+    loss = -lg_sigma_z[range(n), y].sum() / n
+    dlogits = sigma_z.copy()
+    dlogits[range(n), y] -= 1
+    dlogits /= n
 
     """
     TODO: Compute the softmax loss and its gradient using no explicit loops
