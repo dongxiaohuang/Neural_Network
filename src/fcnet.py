@@ -125,7 +125,8 @@ class FullyConnectedNet(object):
         #######################################################################
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
-
+        if y is None:
+            self.dropout_params["train"] = False
         Xi = linear_cache["0"] = X
         if self.use_dropout:
             p, t, s = self.dropout_params["p"],\
