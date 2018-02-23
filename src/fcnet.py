@@ -21,6 +21,8 @@ def random_init(n_in, n_out, weight_scale=5e-2, dtype=np.float32):
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
 
+    W = np.random.normal(0, weight_scale, (n_in*n_out)).reshape(n_in, n_out)
+    b = np.zeros(n_out)
 
     ###########################################################################
     #                            END OF YOUR CODE                             #
@@ -70,6 +72,12 @@ class FullyConnectedNet(object):
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
 
+        dims = [input_dim] + hidden_dims + [num_classes]
+        for i in range(self.num_layers):
+            W, b = random_init(dims[i], dims[i+1], weight_scale, self.dtype)
+            Wi, bi = 'W' + str(i+1), 'b' + str(i+1)
+            self.params[Wi] = W
+            self.params[bi] = b
 
         #######################################################################
         #                            END OF YOUR CODE                         #
@@ -118,6 +126,17 @@ class FullyConnectedNet(object):
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
 
+        linear_cache['0'] = X
+        for i in range(self.num_layers):
+            W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
+            linear_cache[str(i+1)] = linear_forward(linear_cache[str(i)], W, b)
+            if i != self.num_layers-1:
+                relu_cache[str(i+1)] = relu_forward(linear_cache[str(i+1)])
+                if self.use_dropout:
+                    p, t, s = self.params['p'], self.params['train'], self.params['seed']
+                    dropout_cache[str(i+1)] = dropout_forward(relu_cache[str(i+1)], p, t, s)
+        scores = linear_cache[str(self.num_layers)]
+        print(scores)
 
         #######################################################################
         #                            END OF YOUR CODE                         #
@@ -139,6 +158,11 @@ class FullyConnectedNet(object):
         #######################################################################
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
+
+        loss, dy = softmax(scores, y)
+        for i in reversed(range(self.num_layers)):
+            W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
+            dX, dW, db = linear_backward(grads[str(i+1)], X, W, b)
 
 
         #######################################################################
