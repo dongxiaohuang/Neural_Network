@@ -126,16 +126,17 @@ class FullyConnectedNet(object):
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
 
-        linear_cache['0'] = X
+        # linear_cache['0'] = X
+        Xi = X
         for i in range(self.num_layers):
             W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
-            linear_cache[str(i+1)] = linear_forward(linear_cache[str(i)], W, b)
+            Xi = linear_cache[str(i+1)] = linear_forward(Xi, W, b)
             if i != self.num_layers-1:
-                relu_cache[str(i+1)] = relu_forward(linear_cache[str(i+1)])
+                Xi = relu_cache[str(i+1)] = relu_forward(Xi)
                 if self.use_dropout:
                     p, t, s = self.params['p'], self.params['train'], self.params['seed']
-                    dropout_cache[str(i+1)] = dropout_forward(relu_cache[str(i+1)], p, t, s)
-        scores = linear_cache[str(self.num_layers)]
+                    Xi = dropout_cache[str(i+1)] = dropout_forward(Xi, p, t, s)
+        scores = Xi
         print(scores)
 
         #######################################################################
