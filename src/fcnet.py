@@ -169,12 +169,27 @@ class FullyConnectedNet(object):
             if i != self.num_layers-1:
                 if self.use_dropout:
                     dX = dropout_backward(dX,\
-                            dropout_cache[str(i)][1], p, t)
-                dX = relu_backward(dX, relu_cache[str(i)])
+                            relu_cache[str(i)], p, t)
+                    lin_X = str(i)][1]
+                else: lin_X = relu_cache[str(i)]
+                dX = relu_backward(dX, linear_cache[str(i)])
             W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
-            dX, dW, db = linear_backward(dX, linear_cache[str(i)], W, b)
+            # if self.use_dropout:
+            #     lin_X = str(i)][1]
+            # else: lin_X = relu_cache[str(i)]
+            W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
+            dX, dW, db = linear_backward(dX,lin_X, W, b)
             grads['W'+str(i+1)], grads['b'+str(i+1)] = dW, db
-
+    # if i != self.num_layers-1:
+    #     if self.use_dropout:
+    #         dX = dropout_backward(dX,\
+    #                 dropout_cache[str(i)][1], p, t)
+    #     dX = relu_backward(dX, relu_cache[str(i)])
+    # if self.use_dropout:
+    #     lin_X = str(i)][1]
+    # else: lin_X = relu_cache[str(i)]
+    # W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
+    # dX, dW, db = linear_backward(dX,lin_X, W, b)
         #######################################################################
         #                            END OF YOUR CODE                         #
         #######################################################################
