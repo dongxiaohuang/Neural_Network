@@ -170,7 +170,7 @@ class FullyConnectedNet(object):
                 if self.use_dropout:
                     dX = dropout_backward(dX,\
                             relu_cache[str(i)], p, t)
-                    lin_X = str(i)][1]
+                    lin_X = dropout_cache[str(i)][1]
                 else: lin_X = relu_cache[str(i)]
                 dX = relu_backward(dX, linear_cache[str(i)])
             W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
