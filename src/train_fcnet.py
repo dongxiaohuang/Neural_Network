@@ -12,17 +12,17 @@ accuracy on the validation set.
 #                           BEGIN OF YOUR CODE                            #
 ###########################################################################
 
-model = FullyConnectedNet([10,10], reg=10)
-solver = Solver(model, get_CIFAR10_data(),
+model = FullyConnectedNet([40,8], reg=0.3)
+data = get_CIFAR10_data()
+solver = Solver(model, data,
                 update_rule='sgd',
                 optim_config={
                   'learning_rate': 1e-3,
                 },
                 lr_decay=0.95,
-                num_epochs=10, batch_size=100,
+                num_epochs=20, batch_size=100,
                 print_every=100)
 solver.train()
-
 
 ##############################################################################
 #                             END OF YOUR CODE                               #
