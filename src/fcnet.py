@@ -21,7 +21,7 @@ def random_init(n_in, n_out, weight_scale=5e-2, dtype=np.float32):
     #                           BEGIN OF YOUR CODE                            #
     ###########################################################################
 
-    W = np.random.normal(0, weight_scale, (n_in*n_out)).reshape(n_in, n_out)
+    W = np.random.randn(n_in, n_out) * weight_scale
     b = np.zeros(n_out)
 
     ###########################################################################
@@ -74,10 +74,10 @@ class FullyConnectedNet(object):
 
         dims = [input_dim] + hidden_dims + [num_classes]
         for i in range(self.num_layers):
-            W, b = random_init(dims[i], dims[i+1], weight_scale, self.dtype)
             Wi, bi = 'W' + str(i+1), 'b' + str(i+1)
-            self.params[Wi] = W
-            self.params[bi] = b
+            self.params[Wi], self.params[bi] = \
+                    random_init(dims[i], dims[i+1], weight_scale, self.dtype)
+
 
         #######################################################################
         #                            END OF YOUR CODE                         #
@@ -125,22 +125,21 @@ class FullyConnectedNet(object):
         #######################################################################
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
-        if y is None:
-            self.dropout_params["train"] = False
-        Xi = linear_cache["0"] = X
+        #if y is None:
+        #    self.dropout_params["train"] = False
+        Xi = linear_cache['0'] = X
         if self.use_dropout:
             p, t, s = self.dropout_params["p"],\
                     self.dropout_params["train"],\
                     self.dropout_params["seed"]
         for i in range(self.num_layers):
             W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
-            Xi = linear_cache[str(i+1)] = linear_forward(Xi, W, b)
+            Xi = relu_cache[str(i)] = linear_forward(Xi, W, b)
             if i != self.num_layers-1:
-                Xi = relu_cache[str(i)] = relu_forward(Xi)
+                Xi = linear_cache[str(i+1)] = dropout_cache[str(i)] = relu_forward(Xi)
                 if self.use_dropout:
                     # receive (out, mask)
-                    dropout_cache[str(i)] = dropout_forward(Xi, p, t, s)
-                    Xi = dropout_cache[str(i)][0]
+                    Xi, linear_cache[str(i+1)] = dropout_forward(Xi, p, t, s)
         scores = Xi
 
         #######################################################################
@@ -169,27 +168,25 @@ class FullyConnectedNet(object):
             if i != self.num_layers-1:
                 if self.use_dropout:
                     dX = dropout_backward(dX,\
-                            relu_cache[str(i)], p, t)
-                    lin_X = dropout_cache[str(i)][1]
-                else: lin_X = relu_cache[str(i)]
-                dX = relu_backward(dX, linear_cache[str(i)])
+                            dropout_cache[str(i)], p, t)
+                dX = relu_backward(dX, relu_cache[str(i)])
             W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
-            # if self.use_dropout:
-            #     lin_X = str(i)][1]
-            # else: lin_X = relu_cache[str(i)]
-            W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
-            dX, dW, db = linear_backward(dX,lin_X, W, b)
-            grads['W'+str(i+1)], grads['b'+str(i+1)] = dW, db
-    # if i != self.num_layers-1:
-    #     if self.use_dropout:
-    #         dX = dropout_backward(dX,\
-    #                 dropout_cache[str(i)][1], p, t)
-    #     dX = relu_backward(dX, relu_cache[str(i)])
-    # if self.use_dropout:
-    #     lin_X = str(i)][1]
-    # else: lin_X = relu_cache[str(i)]
-    # W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
-    # dX, dW, db = linear_backward(dX,lin_X, W, b)
+            dX, dW, db = linear_backward(dX, linear_cache[str(i)], W, b)
+            grads['W'+str(i+1)], grads['b'+str(i+1)] = \
+                    dW + self.reg*self.params['W'+str(i+1)], db
+            loss += 0.5 * self.reg * np.sum(W**2)
+            #if i != self.num_layers-2:
+            #    if self.use_dropout:
+            #        dX = dropout_backward(dX,\
+            #                relu_cache[str(i+1)], p, t)
+            #    dX = relu_backward(dX, linear_cache[str(i+1)])
+            #if self.use_dropout:
+            #    lin_X = dropout_cache[str(i)]
+            #else: lin_X = relu_cache[str(i)]
+            #W, b = self.params['W'+str(i)], self.params['b'+str(i)]
+            #dX, dW, db = linear_backward(dX,lin_X, W, b)
+            #grads['W'+str(i)], grads['b'+str(i)] = dW, db
+            #loss += 0.5 * self.reg * np.sum(W**2)
         #######################################################################
         #                            END OF YOUR CODE                         #
         #######################################################################
