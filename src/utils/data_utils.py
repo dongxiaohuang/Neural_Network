@@ -80,7 +80,7 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000,
       'X_val': X_val, 'y_val': y_val,
       'X_test': X_test, 'y_test': y_test,
     }
-def get_FER2013_data(num_training=28709, num_validation=0, num_test=3589,
+def get_FER2013_data(num_training=5, num_validation=6, num_test=2,
                      subtract_mean=True):
     """
     Load the FER2013 dataset from disk and perform preprocessing to prepare
@@ -90,15 +90,63 @@ def get_FER2013_data(num_training=28709, num_validation=0, num_test=3589,
     # Load the raw CIFAR-10 data
     fer_dir = '/vol/bitbucket/395ML_NN_Data/datasets/FER2013'
     fer_train_dir = '/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Train'
-    X_train = []
-    count = 0;
-    X_train = imread('/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Train/1734.jpg')
-    # for f in os.listdir(fer_train_dir):
-        # fig_dir = fer_train_dir +'/'+ f
-        # fig = imread(fig_dir, mode = ‘L’)
-        # X_train.append(fig)
-    data = pd.read_csv('/vol/bitbucket/395ML_NN_Data/datasets/FER2013/labels_public.txt', sep=",")
-    print(data.ix[0:5,:].to_dict())
+    fer_test_dir = '/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test'
+    is_first = True
+
+    # read file as dictionary
+    label_dic = {}
+    label_file_dir = '/vol/bitbucket/395ML_NN_Data/datasets/FER2013/labels_public.txt'
+    with open(label_file_dir) as f:
+        next(f) # skip first line
+        for line in f:
+            (tag, label) = line.split(',')
+            label_dic[tag] = int(label[0])
+    y_train = []
+    y_test = []
+    y_val = []
+    count_train = 1
+    for f in os.listdir(fer_train_dir):
+        fig_dir = fer_train_dir +'/'+ f
+        fig = imread(name = fig_dir, mode = 'L')
+        if(count_train <= num_training):
+            X_train = imread(name = fig_dir, mode = 'L').tolist()
+            X_train = [X_train, fig]
+            y_train.append(label_dic["Test/"+str(f)])
+            count_train += 1
+        if count_train > num_training:
+            X_val = imread(name = fig_dir, mode = 'L').tolist()
+            X_val = [X_val, fig]
+            y_val.append(label_dic["Test/"+str(f)])
+            count_train += 1
+            if(count_train == num_training + num_validation):
+                X_train = np.array(X_train)
+                X_val = np.array(X_val)
+                break
+    #
+    is_first = True;
+    X_test = []
+    count_test = 1
+    for f in os.listdir(fer_test_dir):
+        fig_dir = fer_test_dir +'/'+ f
+        fig = imread(name = fig_dir, mode = 'L')
+        fig = imread(name = fig_dir, mode = 'L').tolist()
+        print(count_test)
+        print("test" ,num_test)
+        X_test.append(fig)
+        y_test.append(label_dic["Test/"+str(f)])
+        count_test += 1
+        if count_test > num_test :
+            X_test = np.array(X_test)
+            break
+
+    print("training==================")
+    print(X_train.shape, y_train)
+    print("testing==================")
+    print(X_test.shape)
+    print(y_test)
+    print("val==================")
+    print(X_val.shape, y_val)
+    # print(data.ix[0:5,:].to_dict())
 
         # X_train.append(Image.open(os.path.join(path,f))
 
