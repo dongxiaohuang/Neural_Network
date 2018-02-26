@@ -71,8 +71,8 @@ def relu_backward(dout, X):
     """
 
     out = X.copy()     # Must use copy to avoid pass by reference
-    out[out <  0] = 0
-    out[out >= 0] = 1
+    out[out < 0] = 0
+    out[out > 0] = 1
     return out * dout
 
 
