@@ -125,8 +125,9 @@ class FullyConnectedNet(object):
         #######################################################################
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
-        #if y is None:
-        #    self.dropout_params["train"] = False
+        
+        if y is None:
+            self.dropout_params["train"] = False
         Xi = linear_cache['0'] = X
         if self.use_dropout:
             p, t, s = self.dropout_params["p"],\
@@ -175,18 +176,7 @@ class FullyConnectedNet(object):
             grads['W'+str(i+1)], grads['b'+str(i+1)] = \
                     dW + self.reg*self.params['W'+str(i+1)], db
             loss += 0.5 * self.reg * np.sum(W**2)
-            #if i != self.num_layers-2:
-            #    if self.use_dropout:
-            #        dX = dropout_backward(dX,\
-            #                relu_cache[str(i+1)], p, t)
-            #    dX = relu_backward(dX, linear_cache[str(i+1)])
-            #if self.use_dropout:
-            #    lin_X = dropout_cache[str(i)]
-            #else: lin_X = relu_cache[str(i)]
-            #W, b = self.params['W'+str(i)], self.params['b'+str(i)]
-            #dX, dW, db = linear_backward(dX,lin_X, W, b)
-            #grads['W'+str(i)], grads['b'+str(i)] = dW, db
-            #loss += 0.5 * self.reg * np.sum(W**2)
+        
         #######################################################################
         #                            END OF YOUR CODE                         #
         #######################################################################
