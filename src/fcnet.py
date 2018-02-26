@@ -126,18 +126,21 @@ class FullyConnectedNet(object):
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
 
-        # linear_cache['0'] = X
-        Xi = X
+        Xi = linear_cache["0"] = X
+        if self.use_dropout:
+            p, t, s = self.dropout_params["p"],\
+                    self.dropout_params["train"],\
+                    self.dropout_params["seed"]
         for i in range(self.num_layers):
             W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
             Xi = linear_cache[str(i+1)] = linear_forward(Xi, W, b)
             if i != self.num_layers-1:
-                Xi = relu_cache[str(i+1)] = relu_forward(Xi)
+                Xi = relu_cache[str(i)] = relu_forward(Xi)
                 if self.use_dropout:
-                    p, t, s = self.params['p'], self.params['train'], self.params['seed']
-                    Xi = dropout_cache[str(i+1)] = dropout_forward(Xi, p, t, s)
+                    # receive (out, mask)
+                    dropout_cache[str(i)] = dropout_forward(Xi, p, t, s)
+                    Xi = dropout_cache[str(i)][0]
         scores = Xi
-        print(scores)
 
         #######################################################################
         #                            END OF YOUR CODE                         #
@@ -160,11 +163,16 @@ class FullyConnectedNet(object):
         #                           BEGIN OF YOUR CODE                        #
         #######################################################################
 
-        loss, dy = softmax(scores, y)
+        loss, dX = softmax(scores, y)
         for i in reversed(range(self.num_layers)):
+            if i != self.num_layers-1:
+                if self.use_dropout:
+                    dX = dropout_backward(dX,\
+                            dropout_cache[str(i)][1], p, t)
+                dX = relu_backward(dX, relu_cache[str(i)])
             W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
-            dX, dW, db = linear_backward(grads[str(i+1)], X, W, b)
-
+            dX, dW, db = linear_backward(dX, linear_cache[str(i)], W, b)
+            grads['W'+str(i+1)], grads['b'+str(i+1)] = dW, db
 
         #######################################################################
         #                            END OF YOUR CODE                         #
