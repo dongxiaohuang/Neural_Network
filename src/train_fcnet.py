@@ -16,7 +16,7 @@ model = FullyConnectedNet([50,8], reg = 0.3)
 solver = Solver(model, get_CIFAR10_data(),
                 update_rule='sgd',
                 optim_config={
-                  'learning_rate': 1e-3,
+                  'learning_rate': 5e-3,
                 },
                 lr_decay=0.95,
                 num_epochs=20, batch_size=100,
