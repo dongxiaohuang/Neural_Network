@@ -7,31 +7,23 @@ def softmax (logits, y):
     Args:
     - logits: NumPy array of shape (N, C)
     - y: NumPy array of shape (N, ). y represents the labels corresponding to
-    logits, where y[i] is the label of logits[i], and the value of y have a
-    range of 0 <= y[i] < C
+      logits, where y[i] is the label of logits[i], and the value of y have a
+      range of 0 <= y[i] < C
 
     Returns (as a tuple):
     - loss: Loss scalar
     - dlogits: Loss gradient with respect to logits
     """
-    loss, dlogits = None, None
 
-    n = y.shape[0]
-    X = -logits.max(axis = 1, keepdims = True)     # For numerical stability
-    sigma_z = np.exp(logits + X)                          # Unnormalized probabilities
-    sigma_z /= sigma_z.sum(axis = 1, keepdims = True)     # Each row sums to 1
-    lg_sigma_z = np.log(sigma_z)
-    loss = -lg_sigma_z[range(n), y].sum() / n
-    dlogits = sigma_z.copy()
-    dlogits[range(n), y] -= 1
-    dlogits /= n
+    X = logits.max(axis = 1, keepdims = True)        # For numerical stability
+    sigma = np.exp(logits - X)                       # Unnormalized probabilities
+    sigma /= sigma.sum(axis = 1, keepdims = True)    # Each row sums to 1
 
-    """
-    TODO: Compute the softmax loss and its gradient using no explicit loops
-    Store the loss in loss and the gradient in dW. If you are not careful
-    here, it is easy to run into numeric instability. Don't forget the
-    regularization!
-    """
+    N = y.shape[0]
+    loss = np.log(sigma)
+    loss = - loss[range(N), y].mean()
 
-
+    dlogits = sigma.copy()
+    dlogits[range(N), y] -= 1
+    dlogits /= N
     return loss, dlogits
