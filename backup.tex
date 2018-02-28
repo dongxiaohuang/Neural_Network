@@ -1,6 +1,5 @@
 \documentclass[12pt, a4paper]{article}
 \usepackage[margin = 2cm]{geometry}
-\usepackage{soul}
 % Vertical text spacing
 \parindent = 0cm \parskip = 0cm
 % Section
@@ -47,13 +46,26 @@ During testing, we restore all neurons.
 
 \section*{Q3}
 The softmax function $\sigma : \Re^C \rightarrow [0, 1]^C$ can represent a probability distribution over $C$ classes:
-\[ \sigma(z_1, \dotsm, z_C) = \frac{1}{\exp(z_1) + \dotsm + \exp(z_C)}
+\[ \sigma(z_1, \dots, z_C) = \frac{1}{\exp(z_1) + \dots + \exp(z_C)}
    \begin{bmatrix} \exp(z_1) \\ \vdots \\ \exp(z_C) \end{bmatrix} :=
    \begin{bmatrix} \sigma_1  \\ \vdots \\ \sigma_C  \end{bmatrix} \]
-We applied the ``normalization trick'' described in the coursework manual for numerical stability. The derivatives of the softmax function are
-\[ \frac{\partial \sigma_i}{\partial z_j} = (\delta_{ij} - \sigma_i) \, \sigma_j \qquad \forall i, j \in \{1, \dotsm, C\} \]
-where $\delta_{ij} = 0$ if $i \neq j$ and $\delta_{ij} = 1$ otherwise. Let $y_{i,k} = 1$ if image $i$ belongs to class $k$, otherwise $y_{i,k} = 0$. The cross entropy loss is
-\[ L = -\frac1n \sum_{i=0}^n \left[ y_{i,1} \log \sigma_{i,1} + \dotsm + y_{i,C} \log \sigma_{i,C} \right] \]
+We used the ``normalization trick'' described in the coursework manual for numerical stability.\par
+\bigskip
+Derivatives of the softmax function are
+\[ \frac{\partial \sigma_i}{\partial z_j} = (\delta_{ij} - \sigma_j) \, \sigma_i \qquad \forall \, i, j \in \{1, \dots, C\} \]
+where $\delta_{i,j} = 0$ if $i \neq j$, otherwise $\delta_{i,j} = 1$.\par
+\bigskip
+The cross entropy loss of $n$ images is
+\[ L = -\frac1n \sum_{i=1}^n \left[ y_{i,1} \log \sigma_{i,1} + \dots + y_{i,C} \log \sigma_{i,C} \right] \]
+where $y_{i,k} = 1$ if image $i$ belongs to class $k$, otherwise $y_{i,k} = 0$. Similarly, $\sigma_{i,k}$ is the softmax probability that image $i$ belongs to class $k$.\par
+\bigskip
+Derivatives of the loss function for $k \in \{1, \dots, C\}$ are
+\begin{align*}
+    \frac{\partial L}{\partial z_k}
+    &= -\frac1n \sum_{i=1}^n \left[ \frac{y_{i,1}}{\sigma_{i,1}} \, \frac{\partial \sigma_{i,1}}{\partial z_k} + \dots + \frac{y_{i,C}}{\sigma_{i,C}} \, \frac{\partial \sigma_{i,C}}{\partial z_k} \right]
+    = -\frac1n \sum_{i=1}^n \left[ y_{i,1} \, (\delta_{1,k} - \sigma_k) + \dots + y_{i,C} \, (\delta_{C,k} - \sigma_k) \right] \\
+    &= -\frac1n \sum_{i=1}^n \left( y_{i,1} \, \delta_{1,k} + \dots + y_{i,C} \, \delta_{C,k} - \sigma_k \right) \qquad \qquad \text{since } y_{i,1} + \dots + y_{i,C} = 1
+\end{align*}
 
 \section*{Q4}
 CIFAR-10 data
