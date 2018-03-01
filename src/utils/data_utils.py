@@ -5,6 +5,9 @@ import os
 import pandas as pd
 from scipy.misc import imread
 import platform
+import pickle
+
+
 
 def load_pickle(f):
     version = platform.python_version_tuple()
@@ -114,28 +117,46 @@ def get_FER2013_Train_Test_data():
         for line in f:
             (tag, label) = line.split(',')
             label_dic[tag] = int(label[0])
+    with open('label_dic.pickle', 'wb') as handle:
+        pickle.dump(label_dic, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    # with open('label_dic.pickle', 'rb') as handle:
+    #     label_dic1 = pickle.load(handle)
     X_train = []
     y_train = []
     y_test = []
     for f in os.listdir(fer_train_dir):
         fig_dir = fer_train_dir +'/'+ f
-        fig = imread(name = fig_dir, mode = 'L')
+        fig = imread(name = fig_dir, mode = 'L').reshape(48,48,1)
         X_train.append(fig)
         y_train.append(label_dic["Train/"+str(f)])
+        # if(str(f) == '1.jpg'):
+        #     print(0 == label_dic["Train/"+str(f)])
+        # if(str(f) == '15732.jpg'):
+        #     print(4 == label_dic["Train/"+str(f)])
+        # if(str(f) == '15800.jpg'):
+        #     print(3 == label_dic["Train/"+str(f)])
 
     X_test = []
     for f in os.listdir(fer_test_dir):
         fig_dir = fer_test_dir +'/'+ f
-        fig = imread(name = fig_dir, mode = 'L')
+        fig = imread(name = fig_dir, mode = 'L').reshape(48,48,1)
         X_test.append(fig)
         y_test.append(label_dic["Test/"+str(f)])
-
+        # if(str(f) == '32290.jpg'):
+        #     print(1 == label_dic["Test/"+str(f)])
+        # if(str(f) == '32285.jpg'):
+        #     print(5 == label_dic["Test/"+str(f)])
     X_train = np.array(X_train)
     X_test = np.array(X_test)
-    print(X_train, y_train)
-    print(X_test, y_test)
-    return {
-      'X_train': X_train, 'y_train': y_train,
-      'X_test': X_test, 'y_test': y_test,
-    }
+
+    data = {'X_train': X_train, 'y_train': y_train,
+    'X_test': X_test, 'y_test': y_test}
+    with open('data.pickle', 'wb') as handle:
+        pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+    # with open('data.pickle', 'rb') as handle:
+    #     data = pickle.load(handle)
+
+    return data
 get_FER2013_Train_Test_data()
