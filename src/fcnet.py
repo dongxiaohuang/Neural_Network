@@ -5,30 +5,19 @@ from src.layers import (linear_forward, linear_backward, relu_forward,
                         relu_backward, dropout_forward, dropout_backward)
 
 
-
-def random_init(n_in, n_out, weight_scale=5e-2, dtype=np.float32):
+def random_init (n_in, n_out, weight_scale = 5e-2, dtype = np.float32):
     """
     Weights should be initialized from a normal distribution with standard
     deviation equal to weight_scale and biases should be initialized to zero.
 
     Args:
-    - n_in: The number of input nodes into each output.
-    - n_out: The number of output nodes for each input.
+    - n_in: Number of input nodes into each output.
+    - n_out: Number of output nodes for each input.
     """
-    W = None
-    b = None
-    ###########################################################################
-    #                           BEGIN OF YOUR CODE                            #
-    ###########################################################################
 
     W = np.random.randn(n_in, n_out) * weight_scale
     b = np.zeros(n_out)
-
-    ###########################################################################
-    #                            END OF YOUR CODE                             #
-    ###########################################################################
     return W, b
-
 
 
 class FullyConnectedNet(object):
@@ -36,24 +25,27 @@ class FullyConnectedNet(object):
     Implements a fully-connected neural networks with arbitrary size of
     hidden layers. For a network with N hidden layers, the architecture would
     be as follows:
+
     [linear - relu - (dropout)] x (N - 1) - linear - softmax
+
     The learnable params are stored in the self.params dictionary and are
     learned with the Solver.
     """
-    def __init__(self, hidden_dims, input_dim=32*32*3, num_classes=10,
-                 dropout=0, reg=0.0, weight_scale=1e-2, dtype=np.float32,
-                 seed=None):
+
+    def __init__(self, hidden_dims, input_dim = 32*32*3, num_classes = 10,
+                 dropout = 0, reg = 0.0, weight_scale = 1e-2, dtype = np.float32,
+                 seed = None):
         """
         Initialise the fully-connected neural networks.
         Args:
-        - hidden_dims: A list of the size of each hidden layer
-        - input_dim: A list giving the size of the input
-        - num_classes: Number of classes to classify.
+        - hidden_dims: List of the sizes of each hidden layer
+        - input_dim: List giving the size of the input
+        - num_classes: Number of classes to classify
         - dropout: A scalar between 0. and 1. determining the dropout factor.
-        If dropout = 0., then dropout is not applied.
-        - reg: Regularisation factor.
-
+          If dropout = 0, then dropout is not applied.
+        - reg: Regularisation factor
         """
+
         self.dtype = dtype
         self.reg = reg
         self.num_layers = 1 + len(hidden_dims)
@@ -98,9 +90,11 @@ class FullyConnectedNet(object):
     def loss(self, X, y=None):
         """
         Compute loss and gradient for a minibatch of data.
+
         Args:
         - X: Input data, numpy array of shape (N, d_1, ..., d_k)
-        - y: Array of labels, of shape (N,). y[i] gives the label for X[i].
+        - y: Array of labels, of shape (N,). y[i] gives the label for X[i]
+
         Returns:
         If y is None, then run a test-time forward pass of the model and
         return:
