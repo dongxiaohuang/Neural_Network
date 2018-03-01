@@ -1,11 +1,9 @@
-# useful tutorial
-#https://cambridgespark.com/content/tutorials/convolutional-neural-networks-with-keras/index.html
-
-from keras.datasets import cifar10 # subroutines for fetching the CIFAR-10 dataset
 from keras.models import Model # basic class for specifying and training a neural network
 from keras.layers import Input, Convolution2D, MaxPooling2D, Dense, Dropout, Flatten
 from keras.utils import np_utils # utilities for one-hot encoding of ground truth values
 import numpy as np
+import pickle
+
 
 # Using TensorFlow backend.
 
@@ -19,9 +17,14 @@ drop_prob_1 = 0.25 # dropout after pooling with probability 0.25
 drop_prob_2 = 0.5 # dropout in the FC layer with probability 0.5
 hidden_size = 512 # the FC layer will have 512 neurons
 
-(X_train, y_train), (X_test, y_test) = cifar10.load_data() # fetch CIFAR-10 data
+with open('data.pickle', 'rb') as handle:
+    data = pickle.load(handle)
+X_train = data['X_train']
+y_train = data['y_train']
+X_test = data['X_test']
+y_test = data['y_test']
 
-num_train, height, width, depth = X_train.shape # there are 50000 training examples in CIFAR-10
+num_train, depth, height, width = X_train.shape # there are 50000 training examples in CIFAR-10
 num_test = X_test.shape[0] # there are 10000 test examples in CIFAR-10
 num_classes = np.unique(y_train).shape[0] # there are 10 image classes
 
@@ -33,7 +36,7 @@ X_test /= np.max(X_test) # Normalise data to [0, 1] range
 Y_train = np_utils.to_categorical(y_train, num_classes) # One-hot encode the labels
 Y_test = np_utils.to_categorical(y_test, num_classes) # One-hot encode the labels
 
-inp = Input(shape=(height, width, depth)) # depth goes last in TensorFlow back-end (first in Theano)
+inp = Input(shape=(depth, height, width)) # depth goes last in TensorFlow back-end (first in Theano)
 # Conv [32] -> Conv [32] -> Pool (with dropout on the pooling layer)
 conv_1 = Convolution2D(conv_depth_1, (kernel_size, kernel_size), padding='same', activation='relu')(inp)
 conv_2 = Convolution2D(conv_depth_1, (kernel_size, kernel_size), padding='same', activation='relu')(conv_1)
