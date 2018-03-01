@@ -76,44 +76,35 @@ def relu_backward(dout, X):
     return out * dout
 
 
-def dropout_forward(X, p=0.5, train=True, seed=42):
+def dropout_forward (X, p = 0.5, train = True, seed = 42):
     """
     Compute f
     Args:
-    - X: Input data, a numpy array of any shape.
+    - X: Input data, a NumPy array of any shape
     - p: Dropout parameter. We drop each neuron output with probability p.
-    Default is p = 0.5.
+      Default is p = 0.5.
     - train: Mode of dropout. If train is True, then perform dropout;
-      Otherwise train is False (= test mode). Default is train=True.
+      Otherwise train is False (= test mode). Default is train = True.
 
     Returns (as a tuple):
     - out: Output of dropout applied to X, same shape as X.
-    - mask: In training mode, mask is the dropout
-      mask that was used to multiply the input; in test mode, mask is None.
+    - mask: In training mode, mask is the dropout mask
+      that was used to multiply the input; in test mode, mask is None.
     """
-    out = None
-    mask = None
-    if seed:
-        np.random.seed(seed)
-    """
-    TODO: Implement the inverted dropout forward pass. Make sure to consider
-    both train and test case. Pay attention scaling the activation function.
-    """
-    ###########################################################################
-    #                           BEGIN OF YOUR CODE                            #
-    ###########################################################################
+
+    if seed: np.random.seed(seed)
+
     if train:
-        mask = np.random.binomial(1, 1-p, X.shape)/(1-p)
+        mask = np.random.binomial(1, 1 - p, X.shape) / (1 - p)
         out = X * mask
     else:
+        mask = None
         out = X
-    ###########################################################################
-    #                            END OF YOUR CODE                             #
-    ###########################################################################
+
     return out, mask
 
 
-def dropout_backward(dout, mask, p=0.5, train=True):
+def dropout_backward (dout, mask, p = 0.5, train = True):
     """
     Compute the backward pass for dropout
     Args:
@@ -128,19 +119,8 @@ def dropout_backward(dout, mask, p=0.5, train=True):
     Returns:
     - dX: A numpy array, derivative with respect to X
     """
-    dX = None
-    """
-    TODO: Implement the inverted backward pass for dropout. Make sure to
-    consider both train and test case.
-    """
-    ###########################################################################
-    #                           BEGIN OF YOUR CODE                            #
-    ###########################################################################
-    if train:
-        dX = dout * mask
-    else:
-        dX = dout
-    ###########################################################################
-    #                            END OF YOUR CODE                             #
-    ###########################################################################
+
+    if train: dX = dout * mask
+    else:     dX = dout
+
     return dX
