@@ -93,10 +93,13 @@ def get_FER2013_data(num_training=28709, num_validation=0, num_test=3589,
     X_train = []
     count = 0;
     X_train = imread('/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Train/1734.jpg')
-    # for f in os.listdir(fer_train_dir):
-        # fig_dir = fer_train_dir +'/'+ f
-        # fig = imread(fig_dir, mode = ‘L’)
-        # X_train.append(fig)
+    for f in os.listdir(fer_train_dir):
+        if(count == 5):
+        fig_dir = fer_train_dir +'/'+ f
+        fig = imread(fig_dir, mode = ‘L’)
+        X_train.append(fig)
+        print(X_train)
+        count += 1
     data = pd.read_csv('/vol/bitbucket/395ML_NN_Data/datasets/FER2013/labels_public.txt', sep=",")
     print(data.ix[0:5,:].to_dict())
 
