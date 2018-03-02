@@ -89,7 +89,7 @@ def get_FER2013_data(num_training=18000, num_validation=2000, num_test=2):
     it for classifiers. These are the same steps as we used for the SVM, but
     condensed to a single function.
     """
-    with open('data.pickle', 'rb') as handle:
+    with open('src/utils/data.pickle', 'rb') as handle:
         data = pickle.load(handle)
     X_train = data['X_train'][0:num_training]
     y_train = data['y_train'][0:num_training]
@@ -99,9 +99,9 @@ def get_FER2013_data(num_training=18000, num_validation=2000, num_test=2):
     y_test = data['y_test'][0:num_test]
     print(X_test.shape)
     return {
-            'X_train': X_train, 'y_train': y_train,
-            'X_val': X_val, 'y_val': y_val,
-            'X_test': X_test, 'y_test': y_test,
+            'X_train': X_train, 'y_train': np.array(y_train),
+            'X_val': X_val, 'y_val': np.array(y_val),
+            'X_test': X_test, 'y_test': np.array(y_test),
     }
 def get_FER2013_Train_Test_data():
     # Load the raw CIFAR-10 data
