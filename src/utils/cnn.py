@@ -10,7 +10,7 @@ from keras.preprocessing.image import ImageDataGenerator
 # Using TensorFlow backend.
 
 batch_size = 32 # in each iteration, we consider 32 training examples at once
-num_epochs = 150 # we iterate 200 times over the entire training set
+num_epochs = 5 # we iterate 200 times over the entire training set
 kernel_size = 3 # we will use 3x3 kernels throughout
 pool_size = 2 # we will use 2x2 pooling throughout
 conv_depth_1 = 32 # we will initially have 32 kernels per conv. layer...
@@ -21,7 +21,6 @@ hidden_size = 512 # the FC layer will have 512 neurons
 
 with open('data.pickle', 'rb') as handle:
     data = pickle.load(handle)
-    #TODO: remove the slides
 X_train = data['X_train']
 y_train = data['y_train']
 X_test = data['X_test']
@@ -39,6 +38,12 @@ X_test /= np.max(X_test) # Normalise data to [0, 1] range
 
 Y_train = np_utils.to_categorical(y_train, num_classes) # One-hot encode the labels
 Y_test = np_utils.to_categorical(y_test, num_classes) # One-hot encode the labels
+
+X_train = X_train[0:int(num_train*.9)]
+Y_train = Y_train[0:int(num_train*.9)]
+X_val = X_train[int(num_train*.9+1) :]
+Y_val = Y_train[int(num_train*.9+1) :]
+
 
 inp = Input(shape=(height, width, depth)) # depth goes last in TensorFlow back-end (first in Theano)
 # Conv [32] -> Conv [32] -> Pool (with dropout on the pooling layer)
@@ -59,17 +64,39 @@ out = Dense(num_classes, activation='softmax')(drop_3)
 
 model = Model(inputs=inp, outputs=out) # To define a model, just specify its input and output layers
 
-model.compile(loss='categorical_crossentropy', # using the cross-entropy loss function
-              optimizer='adam', # using the Adam optimiser
-              metrics=['accuracy']) # reporting the accuracy
-# checkpoint
-filepath="./models"
-checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-callbacks_list = [checkpoint]
 
-model.fit(X_train, Y_train,                # Train the model using the training set...
-          batch_size=batch_size, epochs=num_epochs,
-          verbose=1, validation_split=0.1) # ...holding out 10% of the data for validation
+
+#augment the data
+datagen = ImageDataGenerator(
+    featurewise_center=False,  # set input mean to 0 over the dataset
+    samplewise_center=False,  # set each sample mean to 0
+    featurewise_std_normalization=False,  # divide inputs by std of the dataset
+    samplewise_std_normalization=False,  # divide each input by its std
+    zca_whitening=False,  # apply ZCA whitening
+    rotation_range=45,  # randomly rotate images in the range (degrees, 0 to 180)
+    width_shift_range=0.2,  # randomly shift images horizontally (fraction of total width)
+    height_shift_range=0.2,  # randomly shift images vertically (fraction of total height)
+    horizontal_flip=True,  # randomly flip images
+    vertical_flip=False)  # randomly flip images
+datagen.fit(X_train)
+# checkpoint
+filepath="best_models"
+
+
+
+model.compile(loss='categorical_crossentropy', # using the cross-entropy loss function
+        optimizer='adam', # using the Adam optimiser
+        metrics=['accuracy']) # reporting the accuracy
+
+augmented_checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+callbacks_list = [augmented_checkpoint]
+
+model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batch_size),                # Train the model using the training set...
+          steps_per_epoch = len(X_train) / batch_size,#TODO :check
+          epochs=num_epochs,
+          callbacks = callbacks_list,
+          verbose=1,
+          validation_data= (X_val, Y_val)) # ...holding out 10% of the data for validation
 score = model.evaluate(X_test, Y_test, verbose=1)  # Evaluate the trained model on the test set!
 Y_predict = model.predict(X_test, batch_size=None, verbose=1, steps=None)
 y_predict = np.argmax(Y_predict, axis=1)
