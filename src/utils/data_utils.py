@@ -83,11 +83,7 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000,
       'X_val': X_val, 'y_val': y_val,
       'X_test': X_test, 'y_test': y_test,
     }
-<<<<<<< HEAD
-def get_FER2013_data(num_training=18000, num_validation=2000, num_test=3589):
-=======
 def get_FER2013_data(num_training=27000, num_validation=1000, num_test=3500):
->>>>>>> origin/master
     """
     Load the FER2013 dataset from disk and perform preprocessing to prepare
     it for classifiers. These are the same steps as we used for the SVM, but
