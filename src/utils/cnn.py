@@ -76,11 +76,7 @@ y_predict = np.argmax(Y_predict, axis=1)
 
 cm = confusion_matrix(y_test,y_predict)
 print(cm)
-# for i in range(Y_predict[0]):
-#     y_predict.append(np.argmax(Y_predict[i]))
-#
-#
-# print(y_predict)
+
 print('loss : %.2f'%score[0])
 print('acc : %.2f'%score[1]*100)
 # checkpoint
