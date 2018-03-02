@@ -83,24 +83,28 @@ def get_CIFAR10_data(num_training=49000, num_validation=1000, num_test=1000,
       'X_val': X_val, 'y_val': y_val,
       'X_test': X_test, 'y_test': y_test,
     }
+<<<<<<< HEAD
 def get_FER2013_data(num_training=18000, num_validation=2000, num_test=3589):
+=======
+def get_FER2013_data(num_training=27000, num_validation=1000, num_test=3500):
+>>>>>>> origin/master
     """
     Load the FER2013 dataset from disk and perform preprocessing to prepare
     it for classifiers. These are the same steps as we used for the SVM, but
     condensed to a single function.
     """
-    with open('data.pickle', 'rb') as handle:
+    with open('src/utils/data.pickle', 'rb') as handle:
         data = pickle.load(handle)
     X_train = data['X_train'][0:num_training]
     y_train = data['y_train'][0:num_training]
-    X_val = data['X_train'][num_training+1:num_training + num_validation +1]
-    y_val = data['y_train'][num_training+1:num_training + num_validation +1]
+    X_val = data['X_train'][num_training:num_training + num_validation]
+    y_val = data['y_train'][num_training:num_training + num_validation]
     X_test = data['X_test'][0:num_test]
     y_test = data['y_test'][0:num_test]
     return {
-            'X_train': X_train, 'y_train': y_train,
-            'X_val': X_val, 'y_val': y_val,
-            'X_test': X_test, 'y_test': y_test,
+            'X_train': X_train, 'y_train': np.array(y_train),
+            'X_val': X_val, 'y_val': np.array(y_val),
+            'X_test': X_test, 'y_test': np.array(y_test),
     }
 def get_FER2013_Train_Test_data():
     # Load the raw CIFAR-10 data
