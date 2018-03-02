@@ -16,7 +16,12 @@ def test_fer_model(img_folder, model="/path/to/model"):
     """
     preds = None
     ### Start your code here
-
+    X_test = []
+    for f in os.listdir(img_folder):
+        fig_dir = fer_train_dir +'/'+ f
+        fig = imread(name = fig_dir) #TODO check if this model is usable
+        X_test.append(fig)
+    X_test = np.array(X_test)
     #X = load_image(img_folder)
 
     f = open(model, 'rb')
