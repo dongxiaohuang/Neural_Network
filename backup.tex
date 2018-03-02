@@ -52,7 +52,7 @@ The softmax function $\sigma : \Re^C \rightarrow [0, 1]^C$ can represent a proba
 We used the ``normalization trick'' described in the coursework manual for numerical stability.\par
 \bigskip
 Derivatives of the softmax function are
-\[ \frac{\partial \sigma_i}{\partial z_j} = (\delta_{ij} - \sigma_j) \, \sigma_i \qquad \forall \, i, j \in \{1, \dots, C\} \]
+\[ \frac{\partial \sigma_i}{\partial z_j} = (\delta_{i,j} - \sigma_j) \, \sigma_i \qquad \forall \, i, j \in \{1, \dots, C\} \]
 where $\delta_{i,j} = 0$ if $i \neq j$, otherwise $\delta_{i,j} = 1$.\par
 \bigskip
 The cross entropy loss of $n$ images is
@@ -62,18 +62,25 @@ where $y_{i,k} = 1$ if image $i$ belongs to class $k$, otherwise $y_{i,k} = 0$. 
 Derivatives of the loss function for $k \in \{1, \dots, C\}$ are
 \begin{align*}
     \frac{\partial L}{\partial z_k}
-    &= -\frac1n \sum_{i=1}^n \left[ \frac{y_{i,1}}{\sigma_{i,1}} \, \frac{\partial \sigma_{i,1}}{\partial z_k} + \dots + \frac{y_{i,C}}{\sigma_{i,C}} \, \frac{\partial \sigma_{i,C}}{\partial z_k} \right]
-    = -\frac1n \sum_{i=1}^n \left[ y_{i,1} \, (\delta_{1,k} - \sigma_k) + \dots + y_{i,C} \, (\delta_{C,k} - \sigma_k) \right] \\
+    &= -\frac1n \sum_{i=1}^n \left[ \frac{y_{i,1}}{\sigma_{i,1}} \, \frac{\partial \sigma_{i,1}}{\partial z_k} + \dots + \frac{y_{i,C}}{\sigma_{i,C}} \, \frac{\partial \sigma_{i,C}}{\partial z_k} \right] \\
+    &= -\frac1n \sum_{i=1}^n \left[ y_{i,1} \, (\delta_{1,k} - \sigma_k) + \dots + y_{i,C} \, (\delta_{C,k} - \sigma_k) \right] \\
     &= -\frac1n \sum_{i=1}^n \left( y_{i,1} \, \delta_{1,k} + \dots + y_{i,C} \, \delta_{C,k} - \sigma_k \right) \qquad \qquad \text{since } y_{i,1} + \dots + y_{i,C} = 1
 \end{align*}
 
 \section*{Q4}
-CIFAR-10 data
+Architecture + parameters used to overfit a small subset of the CIFAR-10 data, plots of loss and accuracy of train and test set (2 points)
+
+Architecture + parameters used to achieve at least 50\% accuracy on CIFAR-10 as well as plots of loss and accuracy of train and test set (2 points)
 
 \section*{Q5}
+Explanation of how the network was fine-tuned, what strategies were employed. Include plots of accuracy, loss and F1 if appropriate. (6 points for each step , 30 points in total)
+
+Test the performance of the network trained with the optimal set of parameters on the test set and report the confusion matrix, classification rate and F1 measure per class. (5 points)
 
 \section*{A1}
+No free lunch theorem
 
 \section*{A2}
+No change is needed since our functions are written to accommodate an arbitrary number of classes.
 
 \end{document}

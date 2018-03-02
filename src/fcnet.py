@@ -5,30 +5,19 @@ from src.layers import (linear_forward, linear_backward, relu_forward,
                         relu_backward, dropout_forward, dropout_backward)
 
 
-
-def random_init(n_in, n_out, weight_scale=5e-2, dtype=np.float32):
+def random_init (n_in, n_out, weight_scale = 5e-2, dtype = np.float32):
     """
     Weights should be initialized from a normal distribution with standard
     deviation equal to weight_scale and biases should be initialized to zero.
 
     Args:
-    - n_in: The number of input nodes into each output.
-    - n_out: The number of output nodes for each input.
+    - n_in: Number of input nodes into each output
+    - n_out: Number of output nodes for each input
     """
-    W = None
-    b = None
-    ###########################################################################
-    #                           BEGIN OF YOUR CODE                            #
-    ###########################################################################
 
     W = np.random.randn(n_in, n_out) * weight_scale
     b = np.zeros(n_out)
-
-    ###########################################################################
-    #                            END OF YOUR CODE                             #
-    ###########################################################################
     return W, b
-
 
 
 class FullyConnectedNet(object):
@@ -36,31 +25,34 @@ class FullyConnectedNet(object):
     Implements a fully-connected neural networks with arbitrary size of
     hidden layers. For a network with N hidden layers, the architecture would
     be as follows:
+
     [linear - relu - (dropout)] x (N - 1) - linear - softmax
+
     The learnable params are stored in the self.params dictionary and are
     learned with the Solver.
     """
-    def __init__(self, hidden_dims, input_dim=32*32*3, num_classes=10,
-                 dropout=0, reg=0.0, weight_scale=1e-2, dtype=np.float32,
-                 seed=None):
+
+    def __init__(self, hidden_dims, input_dim = 32*32*3, num_classes = 10,
+                 dropout = 0, reg = 0.0, weight_scale = 1e-2, dtype = np.float32,
+                 seed = None):
         """
         Initialise the fully-connected neural networks.
         Args:
-        - hidden_dims: A list of the size of each hidden layer
-        - input_dim: A list giving the size of the input
-        - num_classes: Number of classes to classify.
+        - hidden_dims: List of the sizes of each hidden layer
+        - input_dim: Integer giving the input's size
+        - num_classes: Number of classes to classify
         - dropout: A scalar between 0. and 1. determining the dropout factor.
-        If dropout = 0., then dropout is not applied.
-        - reg: Regularisation factor.
-
+          If dropout = 0, then dropout is not applied.
+        - reg: Regularisation factor
         """
+
         self.dtype = dtype
         self.reg = reg
         self.num_layers = 1 + len(hidden_dims)
         self.use_dropout = True if dropout > 0.0 else False
-        if seed:
-            np.random.seed(seed)
+        if seed: np.random.seed(seed)
         self.params = dict()
+
         """
         TODO: Initialise the weights and bias for all layers and store all in
         self.params. Store the weights and bias of the first layer in keys
@@ -68,24 +60,20 @@ class FullyConnectedNet(object):
         Weights and bias are to be initialised according to the Xavier
         initialisation (see manual).
         """
-        #######################################################################
-        #                           BEGIN OF YOUR CODE                        #
-        #######################################################################
 
         dims = [input_dim] + hidden_dims + [num_classes]
         for i in range(self.num_layers):
-            Wi, bi = 'W' + str(i+1), 'b' + str(i+1)
+            Wi, bi = 'W' + str(i + 1), 'b' + str(i + 1)
             self.params[Wi], self.params[bi] = \
-                    random_init(dims[i], dims[i+1], weight_scale, self.dtype)
+                    random_init(dims[i], dims[i + 1], weight_scale, self.dtype)
 
+        """
+        When using dropout we need to pass a dropout_param dictionary to
+        each dropout layer so that the layer knows the dropout probability
+        and the mode (train / test). You can pass the same dropout_param to
+        each dropout layer.
+        """
 
-        #######################################################################
-        #                            END OF YOUR CODE                         #
-        #######################################################################
-        # When using dropout we need to pass a dropout_param dictionary to
-        # each dropout layer so that the layer knows the dropout probability
-        # and the mode (train / test). You can pass the same dropout_param to
-        # each dropout layer.
         self.dropout_params = dict()
         if self.use_dropout:
             self.dropout_params = {"train": True, "p": dropout}
@@ -95,12 +83,14 @@ class FullyConnectedNet(object):
         for k, v in self.params.items():
             self.params[k] = v.astype(dtype)
 
-    def loss(self, X, y=None):
+    def loss(self, X, y = None):
         """
         Compute loss and gradient for a minibatch of data.
+
         Args:
         - X: Input data, numpy array of shape (N, d_1, ..., d_k)
-        - y: Array of labels, of shape (N,). y[i] gives the label for X[i].
+        - y: Array of labels, of shape (N,). y[i] gives the label for X[i]
+
         Returns:
         If y is None, then run a test-time forward pass of the model and
         return:
@@ -113,28 +103,27 @@ class FullyConnectedNet(object):
         parameter
           names to gradients of the loss with respect to those parameters.
         """
+
         scores = None
         X = X.astype(self.dtype)
         linear_cache = dict()
         relu_cache = dict()
         dropout_cache = dict()
+
         """
         TODO: Implement the forward pass for the fully-connected neural
         network, compute the scores and store them in the scores variable.
         """
-        #######################################################################
-        #                           BEGIN OF YOUR CODE                        #
-        #######################################################################
-        
+
         if y is None:
             self.dropout_params["train"] = False
         Xi = linear_cache['0'] = X
         if self.use_dropout:
-            p, t, s = self.dropout_params["p"],\
-                    self.dropout_params["train"],\
-                    self.dropout_params["seed"]
+            p, t, s = self.dropout_params["p"],     \
+                      self.dropout_params["train"], \
+                      self.dropout_params["seed"]
         for i in range(self.num_layers):
-            W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
+            W, b = self.params['W' + str(i + 1)], self.params['b' + str(i + 1)]
             Xi = relu_cache[str(i)] = linear_forward(Xi, W, b)
             if i != self.num_layers-1:
                 Xi = linear_cache[str(i+1)] = dropout_cache[str(i)] = relu_forward(Xi)
@@ -143,12 +132,8 @@ class FullyConnectedNet(object):
                     Xi, linear_cache[str(i+1)] = dropout_forward(Xi, p, t, s)
         scores = Xi
 
-        #######################################################################
-        #                            END OF YOUR CODE                         #
-        #######################################################################
-        # If y is None then we are in test mode so just return scores
-        if y is None:
-            return scores
+        # If y is None then we are in test mode, so just return scores
+        if y is None: return scores
         loss, grads = 0, dict()
 
         """
@@ -160,24 +145,18 @@ class FullyConnectedNet(object):
         automated tests, make sure that your L2 regularization includes a
         factor of 0.5 to simplify the expression for the gradient.
         """
-        #######################################################################
-        #                           BEGIN OF YOUR CODE                        #
-        #######################################################################
 
         loss, dX = softmax(scores, y)
         for i in reversed(range(self.num_layers)):
-            if i != self.num_layers-1:
+            if i != self.num_layers - 1:
                 if self.use_dropout:
-                    dX = dropout_backward(dX,\
+                    dX = dropout_backward(dX, \
                             dropout_cache[str(i)], p, t)
                 dX = relu_backward(dX, relu_cache[str(i)])
-            W, b = self.params['W'+str(i+1)], self.params['b'+str(i+1)]
+            W, b = self.params['W' + str(i + 1)], self.params['b' + str(i + 1)]
             dX, dW, db = linear_backward(dX, linear_cache[str(i)], W, b)
-            grads['W'+str(i+1)], grads['b'+str(i+1)] = \
-                    dW + self.reg*self.params['W'+str(i+1)], db
+            grads['W' + str(i + 1)], grads['b' + str(i + 1)] = \
+                    dW + self.reg * self.params['W' + str(i + 1)], db
             loss += 0.5 * self.reg * np.sum(W**2)
-        
-        #######################################################################
-        #                            END OF YOUR CODE                         #
-        #######################################################################
+
         return loss, grads
