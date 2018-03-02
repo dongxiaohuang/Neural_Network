@@ -21,28 +21,29 @@ hidden_size = 512 # the FC layer will have 512 neurons
 
 with open('data.pickle', 'rb') as handle:
     data = pickle.load(handle)
-X_train = data['X_train']
-y_train = data['y_train']
+    #TODO: remove the slides
+X_train_t = data['X_train']
+y_train_t = data['y_train']
 X_test = data['X_test']
 y_test = data['y_test']
 # print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 #TODO: y_train to array
-num_train, height, width, depth = X_train.shape # there are 28709 training examples
+num_train, height, width, depth = X_train_t.shape # there are 28709 training examples
 num_test = X_test.shape[0] #number of test exapmles
-num_classes = np.unique(y_train).shape[0] # there are 7 image classes
+num_classes = np.unique(y_train_t).shape[0] # there are 7 image classes
 
-X_train = X_train.astype('float64')
+X_train_t = X_train_t.astype('float64')
 X_test = X_test.astype('float64')
-X_train /= np.max(X_train) # Normalise data to [0, 1] range
+X_train_t /= np.max(X_train_t) # Normalise data to [0, 1] range
 X_test /= np.max(X_test) # Normalise data to [0, 1] range
 
-Y_train = np_utils.to_categorical(y_train, num_classes) # One-hot encode the labels
+Y_train_t = np_utils.to_categorical(y_train_t, num_classes) # One-hot encode the labels
 Y_test = np_utils.to_categorical(y_test, num_classes) # One-hot encode the labels
 
-X_train = X_train[0:int(num_train*.9)]
-Y_train = Y_train[0:int(num_train*.9)]
-X_val = X_train[int(num_train*.9+1) :]
-Y_val = Y_train[int(num_train*.9+1) :]
+X_train = X_train_t[0:int(num_train*.9)]
+Y_train = Y_train_t[0:int(num_train*.9)]
+X_val = X_train_t[int(num_train*.9+1) :]
+Y_val = Y_train_t[int(num_train*.9+1) :]
 
 
 inp = Input(shape=(height, width, depth)) # depth goes last in TensorFlow back-end (first in Theano)
@@ -64,7 +65,9 @@ out = Dense(num_classes, activation='softmax')(drop_3)
 
 model = Model(inputs=inp, outputs=out) # To define a model, just specify its input and output layers
 
-
+model.compile(loss='categorical_crossentropy', # using the cross-entropy loss function
+              optimizer='adam', # using the Adam optimiser
+              metrics=['accuracy']) # reporting the accuracy
 
 #augment the data
 datagen = ImageDataGenerator(
@@ -80,15 +83,8 @@ datagen = ImageDataGenerator(
     vertical_flip=False)  # randomly flip images
 datagen.fit(X_train)
 # checkpoint
-filepath="best_models"
-
-
-
-model.compile(loss='categorical_crossentropy', # using the cross-entropy loss function
-        optimizer='adam', # using the Adam optimiser
-        metrics=['accuracy']) # reporting the accuracy
-
-augmented_checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+filepath="./bestmodels/weights.{epoch:02d}-{val_loss:.2f}.hdf5"
+augmented_checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', period=1)
 callbacks_list = [augmented_checkpoint]
 
 model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batch_size),                # Train the model using the training set...
