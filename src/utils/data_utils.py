@@ -148,6 +148,8 @@ def get_FER2013_Train_Test_data():
             print(5 == label_dic["Test/"+str(f)])
     X_train = np.array(X_train)
     X_test = np.array(X_test)
+    y_train = np.array(y_train)
+    y_test = np.array(y_test)
 
     data = {'X_train': X_train, 'y_train': y_train,
     'X_test': X_test, 'y_test': y_test}
@@ -158,4 +160,3 @@ def get_FER2013_Train_Test_data():
     #     data = pickle.load(handle)
 
     return data
-# get_FER2013_data()
