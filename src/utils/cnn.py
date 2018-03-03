@@ -6,18 +6,23 @@ from keras.callbacks import ModelCheckpoint
 import pickle
 from sklearn.metrics import confusion_matrix
 from keras.preprocessing.image import ImageDataGenerator
+<<<<<<< HEAD
 # import perfomance as pf
+=======
+from keras.models import load_model
+#import perfomance as pf
+>>>>>>> origin/master
 # Using TensorFlow backend.
 
 batch_size = 32 # in each iteration, we consider 32 training examples at once
-num_epochs = 150 # we iterate 200 times over the entire training set
+num_epochs = 200 # we iterate 200 times over the entire training set
 kernel_size = 3 # we will use 3x3 kernels throughout
 pool_size = 2 # we will use 2x2 pooling throughout
 conv_depth_1 = 32 # we will initially have 32 kernels per conv. layer...
 conv_depth_2 = 64 # ...switching to 64 after the first pooling layer
-drop_prob_1 = 0.25 # dropout after pooling with probability 0.25
-drop_prob_2 = 0.5 # dropout in the FC layer with probability 0.5
-hidden_size = 512 # the FC layer will have 512 neurons
+drop_prob_1 = 0.2 # dropout after pooling with probability 0.25
+drop_prob_2 = 0.4 # dropout in the FC layer with probability 0.5
+hidden_size = 1024 # the FC layer will have 512 neurons
 
 with open('data.pickle', 'rb') as handle:
     data = pickle.load(handle)
@@ -75,17 +80,24 @@ datagen = ImageDataGenerator(
     samplewise_center=False,  # set each sample mean to 0
     featurewise_std_normalization=False,  # divide inputs by std of the dataset
     samplewise_std_normalization=False,  # divide each input by its std
-    zca_whitening=False,  # apply ZCA whitening
+    zca_whitening=True,  # apply ZCA whitening
     rotation_range=45,  # randomly rotate images in the range (degrees, 0 to 180)
-    width_shift_range=0.2,  # randomly shift images horizontally (fraction of total width)
-    height_shift_range=0.2,  # randomly shift images vertically (fraction of total height)
+    width_shift_range=0.25,  # randomly shift images horizontally (fraction of total width)
+    height_shift_range=0.25,  # randomly shift images vertically (fraction of total height)
     horizontal_flip=True,  # randomly flip images
     vertical_flip=False)  # randomly flip images
 datagen.fit(X_train)
 # checkpoint
-filepath="./bestmodels/weights.{epoch:02d}-{val_loss:.2f}.hdf5"
+filepath="./bestmodels/weights3.{epoch:02d}-{val_loss:.2f}.hdf5"
 augmented_checkpoint = ModelCheckpoint(filepath, monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=False, mode='auto', period=1)
 callbacks_list = [augmented_checkpoint]
+
+###########################################load model#####################
+# model_resume = load_model('./bestmodels/weights.119-1.23.hdf5')
+# model_resume.compile(loss='categorical_crossentropy', # using the cross-entropy loss function
+#               optimizer='adam', # using the Adam optimiser
+#               metrics=['accuracy']) # reporting the accuracy
+
 
 model.fit_generator(datagen.flow(X_train, Y_train, batch_size=batch_size),                # Train the model using the training set...
           steps_per_epoch = len(X_train) / batch_size,#TODO :check
@@ -99,12 +111,21 @@ y_predict = np.argmax(Y_predict, axis=1)
 
 cm = confusion_matrix(y_test,y_predict)
 print(cm)
+<<<<<<< HEAD
 # # rec_pre = pf.recall_precision_rates(num_classes, cm)
 # # f1 = pf.fa_measure(1, num_classes, rec_pre)
 # # cr = pf.all_classfi_rate(cm)
 #
 # print(cr)
 # print(f1)
+=======
+#rec_pre = pf.recall_precision_rates(num_classes, cm)
+#f1 = pf.fa_measure(1, num_classes, rec_pre)
+#cr = pf.all_classfi_rate(cm)
+
+#print(cr)
+#print(f1)
+>>>>>>> origin/master
 
 print('loss : %.2f'%score[0])
 print('acc : %.2f'%score[1]*100)

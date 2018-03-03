@@ -37,7 +37,7 @@ Of course, images are not row vectors, so they must be reshaped appropriately.
 \subsection*{ReLU activation}
 The forward pass of ReLU is $\max(0, x)$.\par
 \bigskip
-Its derivative is 1 for $x \geq 0$ and 0 for $x < 0$. We apply the chain rule just like the linear layers.
+Its derivative is 1 for $x > 0$ and 0 for $x < 0$. At $x = 0$, its subderivative lies between 0 and 1, so we can simply set it to 1. We apply the chain rule just like the linear layers.
 
 \section*{Q2}
 During training, the forward pass of dropout will multiply the output of some neurons by 0, so it's effectively removing neurons. We can set the proportion $p$ of neurons to dropout, and scale the outputs of the remaining neurons by $1/(1-p)$.\par
@@ -64,13 +64,20 @@ Derivatives of the loss function for $k \in \{1, \dots, C\}$ are
     \frac{\partial L}{\partial z_k}
     &= -\frac1n \sum_{i=1}^n \left[ \frac{y_{i,1}}{\sigma_{i,1}} \, \frac{\partial \sigma_{i,1}}{\partial z_k} + \dots + \frac{y_{i,C}}{\sigma_{i,C}} \, \frac{\partial \sigma_{i,C}}{\partial z_k} \right] \\
     &= -\frac1n \sum_{i=1}^n \left[ y_{i,1} \, (\delta_{1,k} - \sigma_{i,k}) + \dots + y_{i,C} \, (\delta_{C,k} - \sigma_{i,k}) \right] \\
-    &= -\frac1n \sum_{i=1}^n \left( y_{i,1} \, \delta_{1,k} + \dots + y_{i,C} \, \delta_{C,k} - \sigma_{i,k} \right) \qquad \qquad \text{since } y_{i,1} + \dots + y_{i,C} = 1
+    &= \frac1n \sum_{i=1}^n \left( \sigma_{i,k} - y_{i,1} \, \delta_{1,k} - \dots - y_{i,C} \, \delta_{C,k} \right) \qquad \qquad \text{since } y_{i,1} + \dots + y_{i,C} = 1
 \end{align*}
+Note that $y_{i,1} \, \delta_{1,k} + \dots + y_{i,C} \, \delta_{C,k}$ is 1 when $k$ is such that $y_{i,k} = 1$, and it is 0 for other values of $k$. So computing the derivative involves going through each row of
+\[ \begin{bmatrix}
+   \sigma_{1,1} & \dotsm & \sigma_{1,C} \\
+   & \vdots & \\
+   \sigma_{n,1} & \dotsm & \sigma_{n,C}
+   \end{bmatrix} \]
+and subtracting 1 from the appropriate column.
 
 \section*{Q4}
-Architecture + parameters used to overfit a small subset of the CIFAR-10 data, plots of loss and accuracy of train and test set (2 points)
-
-Architecture + parameters used to achieve at least 50\% accuracy on CIFAR-10 as well as plots of loss and accuracy of train and test set (2 points)
+Architecture + parameters (update rule, learning rate, decay, epochs, batch size) used to overfit a small subset of the CIFAR-10 data, plots of loss and accuracy of train and test set (2 points)\par
+\bigskip
+Architecture + parameters (update rule, learning rate, decay, epochs, batch size) used to achieve at least 50\% accuracy on CIFAR-10 as well as plots of loss and accuracy of train and test set (2 points)
 
 \section*{Q5}
 
@@ -82,8 +89,7 @@ Learning rate update schedule:\par
 \subsection*{Step 2}
 We plotted validation loss against time for various learning rates: 0.05, 0.1, 0.2, etc. The best learning rate is one with lowest validation loss for a given training time i.e. it results in lowest asymptotic error and converges rapidly.\par
 \bigskip
-Include the plot for training and validation loss and report training and validation
-classification error.
+Include the plot for training and validation loss and report training and validation classification error.
 
 \subsection*{Step 3}
 Use dropout and report if there is any improvement in the validation performance
@@ -95,7 +101,9 @@ Use L2 and compare the performance with dropout.
 Optimise the number of hidden layers and the number of neurons in each hidden layer.
 
 \section*{A1}
-No free lunch theorem
+In general, no algorithm will perform better than all other algorithms on all datasets (No free lunch theorem).\par
+\bigskip
+Moreover we need to tune hyperparameters, without doing so the algorithms have not been trained properly.
 
 \section*{A2}
 No change is needed since our functions are written to accommodate an arbitrary number of classes.
