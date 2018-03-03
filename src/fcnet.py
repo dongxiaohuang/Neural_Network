@@ -115,8 +115,8 @@ class FullyConnectedNet(object):
         network, compute the scores and store them in the scores variable.
         """
 
-        if y is None:
-            self.dropout_params["train"] = False
+        #if y is None:
+        #    self.dropout_params["train"] = False
         Xi = linear_cache['0'] = X
         if self.use_dropout:
             p, t, s = self.dropout_params["p"],     \
@@ -129,7 +129,8 @@ class FullyConnectedNet(object):
                 Xi = linear_cache[str(i+1)] = dropout_cache[str(i)] = relu_forward(Xi)
                 if self.use_dropout:
                     # receive (out, mask)
-                    Xi, linear_cache[str(i+1)] = dropout_forward(Xi, p, t, s)
+                    Xi, linear_cache[str(i+1)] = dropout_forward(Xi, \
+                            p=p, train=t, seed=s)
         scores = Xi
 
         # If y is None then we are in test mode, so just return scores
@@ -151,7 +152,7 @@ class FullyConnectedNet(object):
             if i != self.num_layers - 1:
                 if self.use_dropout:
                     dX = dropout_backward(dX, \
-                            dropout_cache[str(i)], p, t)
+                            dropout_cache[str(i)], p=p, train=t)
                 dX = relu_backward(dX, relu_cache[str(i)])
             W, b = self.params['W' + str(i + 1)], self.params['b' + str(i + 1)]
             dX, dW, db = linear_backward(dX, linear_cache[str(i)], W, b)
