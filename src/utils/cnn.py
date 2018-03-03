@@ -6,7 +6,7 @@ from keras.callbacks import ModelCheckpoint
 import pickle
 from sklearn.metrics import confusion_matrix
 from keras.preprocessing.image import ImageDataGenerator
-import perfomance as pf
+# import perfomance as pf
 # Using TensorFlow backend.
 
 batch_size = 32 # in each iteration, we consider 32 training examples at once
@@ -99,12 +99,12 @@ y_predict = np.argmax(Y_predict, axis=1)
 
 cm = confusion_matrix(y_test,y_predict)
 print(cm)
-rec_pre = pf.recall_precision_rates(num_classes, cm)
-f1 = pf.fa_measure(1, num_classes, rec_pre)
-cr = pf.all_classfi_rate(cm)
-
-print(cr)
-print(f1)
+# # rec_pre = pf.recall_precision_rates(num_classes, cm)
+# # f1 = pf.fa_measure(1, num_classes, rec_pre)
+# # cr = pf.all_classfi_rate(cm)
+#
+# print(cr)
+# print(f1)
 
 print('loss : %.2f'%score[0])
 print('acc : %.2f'%score[1]*100)
