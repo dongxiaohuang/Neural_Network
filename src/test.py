@@ -58,5 +58,3 @@ solver.train()
 #for i in range(data['y_test'].shape[0]):
 #    matrix[pre[i]][data['y_test'][i]] += 1
 #print(matrix)
-
-
