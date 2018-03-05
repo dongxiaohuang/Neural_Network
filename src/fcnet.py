@@ -17,7 +17,7 @@ def random_init (n_in, n_out, weight_scale = 5e-2, dtype = np.float32):
 
     W = np.random.randn(n_in, n_out) * weight_scale
     b = np.zeros(n_out)
-    return W, b
+    return W.astype(dtype), b.astype(dtype)
 
 
 class FullyConnectedNet(object):
@@ -115,22 +115,22 @@ class FullyConnectedNet(object):
         network, compute the scores and store them in the scores variable.
         """
 
-        #if y is None:
-        #    self.dropout_params["train"] = False
+        if self.use_dropout:
+            self.dropout_params["train"] = False if y is None else True
+
         Xi = linear_cache['0'] = X
         if self.use_dropout:
-            p, t, s = self.dropout_params["p"],     \
-                      self.dropout_params["train"], \
-                      self.dropout_params["seed"]
+            p, t = self.dropout_params["p"],     \
+                      self.dropout_params["train"]
         for i in range(self.num_layers):
             W, b = self.params['W' + str(i + 1)], self.params['b' + str(i + 1)]
             Xi = relu_cache[str(i)] = linear_forward(Xi, W, b)
             if i != self.num_layers-1:
-                Xi = linear_cache[str(i+1)] = dropout_cache[str(i)] = relu_forward(Xi)
+                Xi = linear_cache[str(i+1)] = relu_forward(Xi)
                 if self.use_dropout:
                     # receive (out, mask)
-                    Xi, linear_cache[str(i+1)] = dropout_forward(Xi, \
-                            p=p, train=t, seed=s)
+                    Xi, dropout_cache[str(i)] = dropout_forward(Xi, \
+                            p, t, None)
         scores = Xi
 
         # If y is None then we are in test mode, so just return scores

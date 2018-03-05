@@ -29,11 +29,11 @@ def test_fer_model(img_folder, model="/src/utils/model.pickle"):
     ### End of code
     return preds
 
-#model = FullyConnectedNet([128, 32], input_dim=48*48*1, num_classes=7,\
-#                          dropout=0, seed=42, reg = 0.3)
-f = open('model.pickle', 'rb')
-model = pickle.load(f)
-f.close()
+model = FullyConnectedNet([512, 128], input_dim=48*48*1, num_classes=7,\
+                          dropout=0.5, dtype=np.float32, reg = 10)
+#f = open('model.pickle', 'rb')
+#model = pickle.load(f)
+#f.close()
 
 data = get_FER2013_data()
 solver = Solver(model, data,
@@ -44,10 +44,19 @@ solver = Solver(model, data,
             lr_decay=0.95,
             num_epochs=100, batch_size=100,
             print_every=200)
-#solver.train()
+solver.train()
 
 #f = open('model.pickle', 'wb')
 #pickle.dump(model, f)
 #f.close()
 
-print("acc: ", solver.check_accuracy(data['X_test'], data['y_test']))
+#acc, pre = solver.check_accuracy(data['X_test'], data['y_test'])
+#print("acc: ", acc)
+
+#n = np.unique(data['y_test']).shape[0]
+#matrix = np.zeros((n,n), int)
+#for i in range(data['y_test'].shape[0]):
+#    matrix[pre[i]][data['y_test'][i]] += 1
+#print(matrix)
+
+
