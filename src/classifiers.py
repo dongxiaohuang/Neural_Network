@@ -20,7 +20,8 @@ def softmax (logits, y):
     sigma /= sigma.sum(axis = 1, keepdims = True)    # Each row sums to 1
 
     N = y.shape[0]
-    loss = np.log(sigma)
+    sig = np.ma.log(sigma)
+    loss = sig.filled(0)
     loss = - loss[range(N), y].mean()
 
     dlogits = sigma.copy()

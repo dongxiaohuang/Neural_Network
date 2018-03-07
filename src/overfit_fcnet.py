@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 from src.fcnet import FullyConnectedNet
 from src.utils.solver import Solver
 from src.utils.data_utils import get_CIFAR10_data
@@ -17,3 +17,18 @@ solver = Solver(model, data,
                 num_epochs = 20, batch_size = 100,
                 print_every=100)
 solver.train()
+
+plt.subplot(2,1,1)
+plt.title("Training loss")
+plt.plot(solver.loss_history, "o")
+plt.xlabel("Iteratition")
+
+plt.subplot(2,1,2)
+plt.title('Overfit Network Accuracy')
+plt.plot(solver.train_acc_history, "-o", label = 'train')
+plt.plot(solver.val_acc_history, "-o", label = 'val')
+plt.plot([0.5]* len(solver.val_acc_history), 'k--')
+plt.xlabel('Epoch')
+plt.legend(loc='lower right')
+plt.gcf().set_size_inches(15, 12)
+plt.show()

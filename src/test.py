@@ -3,8 +3,9 @@ import numpy as np
 from src.fcnet import FullyConnectedNet
 from src.utils.solver import Solver
 from src.utils.data_utils import get_FER2013_data
+import pickle
 
-def test_fer_model(img_folder, model="/path/to/model"):
+def test_fer_model(img_folder, model="/src/utils/model.pickle"):
     """
     Given a folder with images, load the images and your best model to predict
     the facial expression of each image.
@@ -16,24 +17,24 @@ def test_fer_model(img_folder, model="/path/to/model"):
     """
     preds = None
     ### Start your code here
-    X_test = []
-    for f in os.listdir(img_folder):
-        fig_dir = fer_train_dir +'/'+ f
-        fig = imread(name = fig_dir) #TODO check if this model is usable
-        X_test.append(fig)
-    X_test = np.array(X_test)
-    #X = load_image(img_folder)
+
+    #X, y = load_image(img_folder)
 
     f = open(model, 'rb')
     fcn_model = pickle.load(f)
     f.close()
 
-    #preds = fcn_model.loss(X)
+    #preds = solver.check_accuracy(X, y)
 
     ### End of code
     return preds
 
-model = FullyConnectedNet([512,128], input_dim=48*48*1, num_classes=7, reg = 0.0)
+model = FullyConnectedNet([512, 128], input_dim=48*48*1, num_classes=7,\
+                          dropout=0.5, dtype=np.float32, reg = 10)
+#f = open('model.pickle', 'rb')
+#model = pickle.load(f)
+#f.close()
+
 data = get_FER2013_data()
 solver = Solver(model, data,
             update_rule='sgd_momentum',
@@ -41,10 +42,19 @@ solver = Solver(model, data,
                 'learning_rate': 1e-3,
             },
             lr_decay=0.95,
-            num_epochs=10, batch_size=100,
-            print_every=100)
+            num_epochs=100, batch_size=100,
+            print_every=200)
 solver.train()
 
-f = open('model.pickle', 'wb')
-pickle.dump(model, f)
-f.close()
+#f = open('model.pickle', 'wb')
+#pickle.dump(model, f)
+#f.close()
+
+#acc, pre = solver.check_accuracy(data['X_test'], data['y_test'])
+#print("acc: ", acc)
+
+#n = np.unique(data['y_test']).shape[0]
+#matrix = np.zeros((n,n), int)
+#for i in range(data['y_test'].shape[0]):
+#    matrix[pre[i]][data['y_test'][i]] += 1
+#print(matrix)

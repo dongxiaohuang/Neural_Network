@@ -255,7 +255,7 @@ class Solver(object):
         y_pred = np.hstack(y_pred)
         acc = np.mean(y_pred == y)
 
-        return acc
+        return acc#, y_pred
 
 
     def train(self):
