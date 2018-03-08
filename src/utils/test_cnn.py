@@ -1,5 +1,6 @@
 import numpy as np
 from os import listdir
+import pickle
 from scipy.misc import imread
 from keras.models import load_model
 
@@ -27,7 +28,7 @@ def test_deep_fer_model(img_folder, model= './utils/bestmodels/weights.149-1.11.
     print("Loading finished!")
     X_test = np.array(X_test)
 
-    with open('mean_image.pickle', 'rb') as handle:
+    with open('./utils/mean_image.pickle', 'rb') as handle:
         mean_image = pickle.load(handle)
 
     X_test = X_test.astype('float64')
