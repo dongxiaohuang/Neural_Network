@@ -17,6 +17,8 @@
 \newcolumntype{R}[1]{>{\raggedleft \TS\BS\arraybackslash}m{#1}}
 % Equations
 \usepackage{amsmath, bm, bbold, tikz}
+\usepackage{biblatex}
+\addbibresource{ref.bib}
 
 \title{\vspace{-6ex} CO395 Group 57 \vspace{-1ex}}
 \author{Dongxiao Huang, Zheng Xun Phang, Yufeng Zhang}
@@ -79,7 +81,7 @@ Note that $y_{i,1} \, \delta_{1,k} + \dots + y_{i,C} \, \delta_{C,k}$ is 1 when 
    & \vdots & \\
    \sigma_{n,1} & \dotsm & \sigma_{n,C}
    \end{bmatrix} \]
-and subtracting 1 from the appropriate column.
+and subtracting 1 from the appropriate column \cite{cross}.
 
 \section*{Question 4}
 
@@ -122,7 +124,7 @@ Plots of loss function and classification accuracy are provided below.
 \section*{Question 5}
 
 \subsection*{Step 1: Architecture Design}
-A reasonable architecture to start with is: 2 hidden layers with 512 and 128 neurons respectively, since 512 and 128 are between our input size ($48 \times 48 = 2304$ pixels) and output size (7 labels). This is a common rule of thumb; there is no consensus on what a good architecture is anyway.\par
+A reasonable architecture to start with is: 2 hidden layers with 512 and 128 neurons respectively, since 512 and 128 are between our input size ($48 \times 48 = 2304$ pixels) and output size (7 labels). This is a common rule of thumb \cite{arch}; there is no consensus on what a good architecture is anyway.\par
 \bigskip
 We initialized the neural net's weights from a standard Normal distribution independently.\par
 \bigskip
@@ -139,7 +141,7 @@ Why 9000 iterations? There are about 270 iterations per epoch and we trained our
 The optimal learning rate is the one with highest validation accuracy i.e. lowest asymptotic error. This turns out to be around $5 \times 10^{-4}$ and it results in a training accuracy of 72\% (error of 28\%) and a validation accuracy of 42\% (error of 58\%).\par
 \bigskip
 
-\begin{figure} [p]
+\begin{figure} [h!]
     \begin{minipage}{\textwidth}
     \centering
     \includegraphics[width=\linewidth] {lr_compare.jpeg}
@@ -151,7 +153,7 @@ The optimal learning rate is the one with highest validation accuracy i.e. lowes
 We dropped out various proportions of neurons and plotted the training and test accuracy in Figure \ref{dropout}.\par
 \bigskip
 
-\begin{figure} [p]
+\begin{figure} [h!]
     \centering
     \includegraphics[width=\linewidth]{dropout_compare.jpeg}
     \caption{Dropout} \label{dropout}
@@ -204,11 +206,10 @@ Confusion matrix based on test data:\par
 \end{tabular}
 \end{center}
 \bigskip
-Note: It makes no sense to compute classification rate for each emotion separately. For example, if the actual emotion is Anger then (Fear, Surprise) counts as a true negative for Anger even though it is a misclassification! In other words, if an instance of Fear is misclassified as Surprise, it should not be taken as evidence that our neural nets are good at detecting Anger.\par
-\bigskip
 Summary statistics from the confusion matrix:
 \begin{center}
 \begin{table} [h!]
+\centering
 \begin{tabular} { C{2.7cm} | C{1.5cm} C{1.5cm} C{1.3cm} C{1.7cm} C{1.5cm} C{1.5cm} C{1.5cm} }
     & Anger & Disgust & Fear & Happiness & Sadness & Surprise & Neutral \\ \hline
     Precision   & 0.380 & 0.743 & 0.373 & 0.601 & 0.355 & 0.653 & 0.387 \\
@@ -219,6 +220,8 @@ Summary statistics from the confusion matrix:
 \caption{Simple Neural Network} \label{simple}
 \end{table}
 \end{center}
+\bigskip
+Note: It makes no sense to compute classification rate for each emotion separately. For example, if the actual emotion is Anger then (Fear, Surprise) counts as a true negative for Anger even though it is a misclassification! In other words, if an instance of Fear is misclassified as Surprise, it should not be taken as evidence that our neural nets are good at detecting Anger.\par
 
 \section*{Question A1}
 
@@ -242,7 +245,7 @@ For both learning algorithms, we need to retune all hyper-parameters by cross va
 
 \section*{Question 6}
 
-We have trained a convolutional neural network (CNN) with batch size = 32, number of epochs = 150 and the following architecture:
+We have trained a convolutional neural network (CNN) \cite{deep} with batch size = 32, number of epochs = 150 and the following architecture:
 \begin{center}
 \begin{tabular} { C{4cm} | L{11cm} }
     Data Argumentation & 1. Randomly rotate images 45 degrees\par
@@ -280,10 +283,13 @@ Confusion matrix based on test data:\par
     Neutral   &  43 &  0 &  31 &  50 &  87 &   5 & 391
 \end{tabular}
 \end{center}
+\bigskip
+
 Summary statistics:
 \begin{center}
 \begin{table} [h!]
-\begin{tabular} { C{2.7cm} | C{1.5cm} C{1.5cm} C{1.3cm} C{1.7cm} C{1.5cm} C{1.5cm} C{1.5cm} }
+\centering
+\begin{tabular} { C{2.5cm} | C{1.5cm} C{1.5cm} C{1.3cm} C{1.7cm} C{1.5cm} C{1.5cm} C{1.5cm} }
     & Anger & Disgust & Fear & Happiness & Sadness & Surprise & Neutral \\ \hline
     Precision   & 0.490 & 0.786 & 0.393 & 0.829 & 0.467 & 0.783 & 0.482 \\
     Recall      & 0.518 & 0.196 & 0.288 & 0.798 & 0.479 & 0.706 & 0.644 \\
@@ -306,6 +312,6 @@ Moreover, the convolution kernel helps to extract ``local'' properties of an ima
     \caption{Architecture of Convolutional Neural Network}
 \end{figure}
 
-\section*{References}
+\printbibliography
 
 \end{document}
