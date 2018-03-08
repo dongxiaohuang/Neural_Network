@@ -45,14 +45,13 @@ Its derivative is 1 for $x > 0$ and 0 for $x < 0$. At $x = 0$, its derivative do
 \section*{Question 2}
 
 \subsection*{Training Phase}
-During training, the forward pass of inverted dropout will multiply the output of some neurons by 0, so it's effectively removing neurons. We can set the proportion $p$ of neurons to dropout, and scale the outputs of the remaining neurons by $1/(1-p)$ and act corresponding activations\par
-During backward training, the 
+During training, the forward pass of inverted dropout will multiply the output of some neurons by 0, so it's effectively removing neurons. We set the proportion $p$ of neurons to dropout, and scale the outputs of the remaining neurons by $1/(1-p)$. The backward pass computes
 \[ \frac{\partial L}{\partial X} = \frac{\partial L}{\partial z} \frac{\partial z}{\partial X} =
 \frac{\partial L}{\partial z} \frac{\partial 
 \left \{
   \begin{tabular}{ccc}
   X$_i$$_j$\qquad \textit{if}  \textit{D}$_i$$_j$ = 1 \\
-   0 \qquad  \textit{ if} \textit{D}$_i$$_j$ = 0 \\
+  0 \qquad  \textit{ if} \textit{D}$_i$$_j$ = 0 \\
   \end{tabular}
 \right \}
 }{\partial X} 
@@ -67,10 +66,10 @@ During backward training, the
 }{\partial X}
 = \frac{\partial L}{\partial z}\mathcal{D}
 \]
+
 \subsection* {Testing Phase}
-Use all activations during forward pass of dropout.\par 
-In backward dropout, \[ 
-\frac{\partial L}{\partial X} = \frac{\partial L}{\partial z} \ones= \frac{\partial L}{\partial z} \]
+During testing, we use all neurons in both forward and backward pass, as if they were never dropped out. The backward pass computes
+\[ \frac{\partial L}{\partial X} = \frac{\partial L}{\partial z} \ones \]
 
 \section*{Question 3}
 
@@ -104,6 +103,9 @@ Note that $y_{i,1} \, \delta_{1,k} + \dots + y_{i,C} \, \delta_{C,k}$ is 1 when 
 and subtracting 1 from the appropriate column.
 
 \section*{Question 4}
+\subsection*{Sanity Check}
+Once after the design of network, in order to check whether the network works or not, a small dataset was used to check if the network can reach overfitting and it can reach 50\% accuracy effortlessly on the validation set.
+\subsection*{Architecture}
 The shapes of our input and output neurons are $32 \times 32 \times 3$ and 10 respectively.\par
 \bigskip
 Our activation function is ReLU and optimization algorithm is Stochastic Gradient Descent.\par
@@ -115,226 +117,217 @@ To achieve at least 50\% accuracy on the CIFAR-10 dataset, we used the architect
 \begin{tabular} { C{4cm} | C{2.5cm} C{3cm} }
     & A & B \\ \hline
     Hidden Neurons      & [50]  & [50, 8] \\
-    Dropout				& None	& None \\
-    Regularization      & None  & None \\
+    Dropout				& None	& None  \\
+    Regularization      & None  & L2 with $\lambda = 0$ \\
     Epochs              &   20  &   20  \\
     Batch Size          &  100  &  100  \\
     Learning Rate       & 0.001 & 0.005 \\
     Learning Rate Decay & 0.95  & 0.95
 \end{tabular}
 \end{center}
+\bigskip
 
 Plots of loss function and classification accuracy are provided below.
 
-\begin{figure}[!htb]
-   \begin{minipage}{0.5\textwidth}
-     \centering
-     \includegraphics[width=\linewidth]{Figure_1.png}
-     \caption{Overfitting}\label{Fig:Data1}
-   \end{minipage}\hfill
-   \begin {minipage}{0.5\textwidth}
-     \centering
-     \includegraphics[width=\linewidth]{train_fcnet.png}
-     \caption{50\% accuracy}\label{Fig:Data2}
-   \end{minipage}
+\begin{figure} [h!]
+    \begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{Figure_1.png}
+    \caption{Overfitting} \label{Fig:Data1}
+    \end{minipage}
+    \begin {minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{train_fcnet.png}
+    \caption{50\% accuracy} \label{Fig:Data2}
+    \end{minipage}
 \end{figure}
 
 \section*{Question 5}
 
 \subsection*{Step 1: Architecture Design}
-A reasonable architecture to start with is: 1 hidden layer with about 1000 neurons, since 1000 is between our input size ($48 \times 48 = 2304$ pixels) and output size (7 labels). There is no consensus on what a good architecture is anyway.\par
+A reasonable architecture to start with is: 2 hidden layers with about 512 and 128 neurons respectively, since 512 and 128 are between our input size ($48 \times 48 = 2304$ pixels) and output size (7 labels). This is a common rule of thumb; there is no consensus on what a good architecture is anyway.\par
 \bigskip
-We initialized the neural net's weights with small random numbers.\par
+We initialized the neural net's weights from a standard Normal distribution.\par
 \bigskip
-Stopping criterion:\par
-Early stopping is a type of regularization to curb overfitting of the training data and requires that you monitor the performance of the model on training and a held validation datasets, each epoch.
-\begin{itemize}
-    \item If training is much better than the validation set, the trainning network probably overfitting so we use techniques like regularization and dropout.
-    \item If training and validation are both low, it is probably underfitting and we increase the capacity of the network and train more or longer.
-    \item If there is an inflection point when training goes above the validation, we choose to use early stopping.
-    \item Once performance on the validation dataset starts to degrade, training can stop.
+We used the default momentum rate of 0.9.\par
+\bigskip
+We used the default learning rate update schedule, which decays the learning rate by 0.95.\par
+\bigskip
+For a start, we used the default ``stopping criterion'' in \texttt{solver.py} which is simply the number of iterations. We tried early stopping but it actually led to lower classification accuracy.\par
+\bigskip
 
-You can also setup checkpoints to save the model if this condition is met (measuring loss of accuracy), and allow the model to keep learning.
-\end{itemize}
-
-\bigskip
-Momentum:\par
-\bigskip
-Learning rate update schedule:\par
-\begin{itemize}
-\item Experiment with very large and very small learning rates.
-\item Grid search common learning rate values from the literature and see how far you can push the network.
-\item Try a learning rate that decreases over epochs.
-\item Try a learning rate that drops every fixed number of epochs by a percentage.
-\item Try adding a momentum term then grid search learning rate and momentum together.
-\item Larger networks need more training, and the reverse. If more neurons or more layers are added, learning rate should be increased.
-
-Learning rate is coupled with the number of training epochs, batch size and optimization method.
-\end{itemize}
 \subsection*{Step 2: Learning Rate}
-We plotted validation loss against time for various learning rates: 0.05, 0.1, 0.2, etc. The best learning rate is one with lowest validation loss for a given training time i.e. it results in lowest asymptotic error and converges rapidly.\par
+We plotted both training and validation classification accuracy (after 9000 iterations) for various learning rates, which range from $10^{-5}$ to $10^{-2}$ on a log scale.\par
 \bigskip
-Include the plot for training and validation loss and report training and validation classification error.
-\begin{figure}[!htb]
-   \begin{minipage}{\textwidth}
-     \centering
-     \includegraphics[width=\linewidth]{lr_compare.png}
-     \caption{Different Learning Rates' Performance}\label{Fig:Data1}
-   \end{minipage}\hfill
+Why 9000 iterations? There are about 270 iterations per epoch and we trained our neural net for 35 epochs, for a total of 9450 iterations.\par
+\bigskip
+The optimal learning rate is the one with highest validation accuracy i.e. lowest asymptotic error. This turns out to be around $5 \times 10^{-4}$ and it results in a training accuracy of 72\% (error of 28\%) and a validation accuracy of 42\% (error of 58\%).
+
+\begin{figure} [!htb]
+    \begin{minipage}{\textwidth}
+    \centering
+    \includegraphics[width=\linewidth] {lr_compare.jpeg}
+    \caption{Different Learning Rates' Performance} \label{Fig:Data1}
+   \end{minipage} \hfill
 \end{figure}
 
 \subsection*{Step 3: Dropout}
-Use dropout and report if there is any improvement in the validation performance
-\begin{figure}[!htb]
-   \begin{minipage}{\textwidth}
-     \centering
-     \includegraphics[width=\linewidth]{dropout_compare.png}
-     \caption{Different Dropout Probabilities' Performance}\label{Fig:Data1}
-   \end{minipage}\hfill
-\end{figure}
-\subsection*{Step 4: L2}
-Use L2 and compare the performance with dropout.
-\begin{figure}[!htb]
-   \begin{minipage}{\textwidth}
-     \centering
-     \includegraphics[width=\linewidth]{l2_compare.png}
-     \caption{Different L2 Regularization Rates' Performance}\label{Fig:Data1}
-   \end{minipage}\hfill
-\end{figure}
-\subsection*{Step 5: Topology}
-\begin{itemize}
-\item Try one hidden layer with a lot of neurons (wide).
-\item Try a deep network with few neurons per layer (deep).
-\item Try combinations of the above.
-\item Try architectures from recent papers on problems similar to yours.
-\item Try topology patterns (fan out then in) and rules of thumb from books and papers (see links below).
-\end{itemize}
+We dropped out various proportions of neurons and plotted the training and test accuracy:
 
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[width=\linewidth]{dropout_compare.jpeg}
+\end{figure}
+
+Dropout does not improve training and test accuracies. This suggests that our neural net might be underfitting, so we should probably increase the number of neurons.\par
+\bigskip
+
+\subsection*{Step 4: L2 Regularization}
+We vary the L2 penalty rate $\lambda$ from 0 to 0.5 and plotted the training loss, training accuracy and validation accuracy in Figure \ref{L2}.\par
+\bigskip
+Just like dropout, L2 regularization does not improve validation accuracy i.e. it is maximized when $\lambda = 0$. This is consistent with our dropout finding that our neural net is underfitting.\par
+\bigskip
+Between dropout and regularization, we prefer the latter because it's more easily reproducible without access to our code. Dropout has an element of arbitrariness.\par
+\bigskip
+
+\begin{figure} [h!]
+    \centering
+    \includegraphics[width=\linewidth] {l2_compare.jpg}
+    \caption{L2 regularization} \label{L2}
+\end{figure}
+
+\subsection*{Step 5: Topology}
+We have experimented with the following architectures:
+\begin{itemize}
+    \item (Wide) 1 layer with 1024 neurons
+    \item (Deep) 5 layers with 512 neurons each
+    \item (Narrowing) 3 layers with [512, 256, 128] neurons
+    \item (Widening) 3 layers with [128, 256, 512] neurons
+    \item (Fan in and out) 3 layers with [512, 128, 512] neurons
+\end{itemize}
+The last architecture is inspired by variational auto-encoders. We have also varied the number of neurons for the ``narrowing'' and ``widening'' architectures.\par
+\bigskip
 
 \subsection*{Final Architecture and Performance}
-\begin{table}
+Our best neural net has [512, 512, 512] neurons and it was trained with these hyperparameters: number of epochs = 35, batch size = 100, learning rate = 0.005 and learning rate decay = 0.95\par
+\bigskip
+Confusion matrix based on test data:\par
 \begin{center}
-\begin{tabular} { C{2cm} | C{1.5cm} | C{2.3cm}| C{2cm}| C{2cm}| C{2cm}| C{2.5cm}}
-     Hidden Neurons & Dropout &Regularizatio &Epochs &Batch Size &Learning Rate & Learning Rate Decay\\ \hline
- 
+\begin{tabular} { C{2.7cm} | C{1.5cm} C{1.5cm} C{1.3cm} C{1.7cm} C{1.5cm} C{1.5cm} C{1.5cm} }
+    \multirow{2}{*}{Actual Class} & \multicolumn{7}{c}{Predicted Class} \\
+    & Anger & Disgust & Fear & Happiness & Sadness & Surprise & Neutral \\ \hline
+    Anger     & 157 &  3 &  48 &  73 &  88 &  18 &  80 \\
+    Disgust   &   6 & 26 &   4 &   9 &   1 &   2 &   8 \\
+    Fear      &  46 &  2 & 166 &  59 & 101 &  42 &  80 \\
+    Happiness &  62 &  2 &  35 & 568 &  95 &  32 & 101 \\
+    Sadness   &  81 &  1 &  75 & 105 & 241 &  26 & 124 \\
+    Surprise  &  22 &  0 &  73 &  24 &  28 & 275 &  29 \\
+    Neutral   &  39 &  1 &  44 & 107 & 124 &  26 & 266
 \end{tabular}
 \end{center}
-\caption{Architectures for Forward Neural Network} 
+\bigskip
+Note: It makes no sense to compute classification rate for each emotion separately. For example, if the actual emotion is Anger then (Fear, Surprise) counts as a true negative for Anger even though it is a misclassification! In other words, if an instance of Fear is misclassified as Surprise, it should not be taken as evidence that our neural nets are good at detecting Anger.\par
+\bigskip
+Summary statistics from the confusion matrix:
+\begin{center}
+\begin{table} [h!]
+\begin{tabular} { C{2.7cm} | C{1.5cm} C{1.5cm} C{1.3cm} C{1.7cm} C{1.5cm} C{1.5cm} C{1.5cm} }
+    & Anger & Disgust & Fear & Happiness & Sadness & Surprise & Neutral \\ \hline
+    Precision   & 0.380 & 0.743 & 0.373 & 0.601 & 0.355 & 0.653 & 0.387 \\
+    Recall      & 0.336 & 0.464 & 0.335 & 0.635 & 0.369 & 0.610 & 0.438 \\
+    $F_1$ score & 0.357 & 0.571 & 0.353 & 0.617 & 0.362 & 0.631 & 0.411
+\end{tabular}
+\[ \text{Classification rate} = \frac{157 + 26 + \dotsm + 266}{3625} = 0.469 \]
+\caption{Simple Neural Network} \label{simple}
 \end{table}
+\end{center}
+
+\section*{Question A1}
+
+The dataset of the previous coursework has only 1004 images, which is far too few for training a neural network as it will overfit. With more observations and appropriate regularization, a neural network may outperform a decision tree, so we cannot conclude that one algorithm is better than the other in general.\par
+\bigskip
+Even if we had a larger dataset, we need to tune hyperparameters. Without doing so, the decision trees and neural nets have not been trained properly.\par
+\bigskip
+In general, no algorithm will perform better than all other algorithms on all datasets (No free lunch theorem).\par
+\bigskip
+Finally, there may be other criteria for deciding the best learning algorithm. Even if our neural net has a lower accuracy than a decision tree (which is unlikely), the former does not require hand-coded features like facial action units. On the other hand, decision trees are often considered to be more interpretable i.e. a glass-box model rather than black-box model.
+
+\section*{Question A2}
+
+For the decision trees coursework, we need to train new decision trees and retrain existing decision trees, because the information gain from splitting on every attribute will change. Of course, we also need to map each emotion to their corresponding integer labels.\par
+\bigskip
+For the neural networks coursework, we only need to change the \texttt{num\_classes} parameter to the new number of classes we have. This will automatically increase the dimensions of our softmax output vector, so we don't need to encode emotions like in decision trees.\par
+\bigskip
+The entire neural net must be retrained since new emotions will affect the softmax probabilities of existing emotions. If we have normalized the training data by subtracting the mean image, then we need to recompute the mean image too.\par
+\bigskip
+For both learning algorithms, we need to retune all hyper-parameters by cross validation. For decision trees, this means tuning the maximum depth. For neural nets, this means adjusting the learning rate, network topology (number of neurons and layers) and regularization factor.
+
+\section*{Question 6}
+
+We have trained a convolutional neural network (CNN) with batch size = 32, number of epochs = 150 and the following architecture:
+\begin{center}
+\begin{tabular} { C{4cm} | L{12cm} }
+    Data Argumentation & 1. Randomly rotate images 45 degrees\par
+    2. Randomly (25\%) shift images horizontally and images vertically\par
+    3. Randomly flip images horizontal and vertically \\ \hline
+
+    Convolution2D & 2 convolutional layers of 32 kernels with size of $3 \times 3$\par
+    using ReLU activation \\ \hline
+
+    Optimization & $2 \times 2$ Maxpool Layer\par
+    (and dropout with probability 0.25) \\ \hline
+
+    Convolution2D & 2 convolutional layers of 64 kernels with size of 3x3\par
+    using ReLU activation \\ \hline
+
+    Optimization & $2 \times 2$ Maxpool Layer\par
+    (and dropout with probability 0.25) \\ \hline
+
+    Full Connected Network & 512 neurons\par
+    Activation: ReLU\par
+    Dropout with probability 0.5\par
+    Activation: Softmax \\
+\end{tabular}
+\end{center}
 
 Confusion matrix based on test data:\par
 \begin{center}
 \begin{tabular} { C{2.7cm} | C{1.5cm} C{1.5cm} C{1.3cm} C{1.7cm} C{1.5cm} C{1.5cm} C{1.5cm} }
     \multirow{2}{*}{Actual Class} & \multicolumn{7}{c}{Predicted Class} \\
     & Anger & Disgust & Fear & Happiness & Sadness & Surprise & Neutral \\ \hline
-    Anger     & 146 &  2 &  60 &  96 &  71 &  19 &  73 \\
-    Disgust   &   4 & 21 &   5 &  11 &   6 &   0 &   9 \\
-    Fear      &  57 &  5 & 156 &  73 &  87 &  42 &  76 \\
-    Happiness &  53 & 10 &  38 & 584 &  85 &  32 &  93 \\
-    Sadness   &  82 &  4 &  84 & 129 & 216 &  23 & 115 \\
-    Surprise  &  26 &  0 &  31 &  39 &  18 & 269 &  32 \\
-    Neutral   &  79 &  4 &  60 &  99 &  94 &  24 & 247
+    Anger     & 242 &  3 &  51 &  21 &  76 &   8 &  66 \\
+    Disgust   &  23 & 11 &   6 &   2 &   9 &   2 &   3 \\
+    Fear      &  70 &  0 & 143 &  18 & 140 &  41 &  84 \\
+    Happiness &  41 &  0 &  14 & 714 &  27 &  19 &  80 \\
+    Sadness   &  62 &  0 &  60 &  37 & 313 &   6 & 175 \\
+    Surprise  &  13 &  0 &  59 &  19 &  18 & 293 &  13 \\
+    Neutral   &  43 &  0 &  31 &  50 &  87 &   5 & 391
 \end{tabular}
 \end{center}
 Summary statistics:
 \begin{center}
+\begin{table} [h!]
 \begin{tabular} { C{2.7cm} | C{1.5cm} C{1.5cm} C{1.3cm} C{1.7cm} C{1.5cm} C{1.5cm} C{1.5cm} }
     & Anger & Disgust & Fear & Happiness & Sadness & Surprise & Neutral \\ \hline
-    Precision   & 0.327 & 0.457 & 0.359 & 0.566 & 0.374 & 0.658 & 0.383 \\
-    Recall      & 0.313 & 0.375 & 0.315 & 0.653 & 0.331 & 0.648 & 0.407 \\
-    $F_1$ score & 0.319 & 0.412 & 0.335 & 0.606 & 0.351 & 0.653 & 0.395
+    Precision   & 0.490 & 0.786 & 0.393 & 0.829 & 0.467 & 0.783 & 0.482 \\
+    Recall      & 0.518 & 0.196 & 0.288 & 0.798 & 0.479 & 0.706 & 0.644 \\
+    $F_1$ score & 0.504 & 0.314 & 0.333 & 0.813 & 0.473 & 0.743 & 0.551
 \end{tabular}
+\[ \text{Classification rate} = \frac{242 + 11 + \dotsm + 391}{3589} = 0.587 \]
+\caption{Convolutional Neural Network} \label{CNN}
+\end{table}
 \end{center}
-\[ \text{Classification rate} = \frac{115 + 0 + \dotsm + 229}{3589} = 0.442 \]\par
 
-\section*{Question A1}
-The dataset of the previous coursework has only 1004 images, which is far too few for training a neural network as it will quickly lead to overfitting. While after using the cross-validation and combining techniques, the trees trained using the small dataset will less possible to be overfitting.\par
-Even if we had a larger dataset, we need to tune hyperparameters. Without doing so, the decision trees and neural nets have not been trained properly.\par
-If one algorithm performs better than the other, it can only be said that in that model gives better predicts in this case. In general, no algorithm will perform better than all other algorithms on all datasets (No free lunch theorem).
-
-\section*{Question A2}
-For the decision trees coursework, we need to train new decision trees according to the number of new emotions. All trees must be retrained, because after add new emotions, we have more training data points, all the probabilities for each AU will be changed because the number of dataset grows. Therefore information gain from splitting on any attribute should be recalculated. In the training process, for each tree, we need to process the classified labels into 0 and 1, for example,  when we train tree for label 4, then if the training points' label is 4, we set it to 1, otherwise 0. We need to do this for the new training trees.
-
+Comparing Table \ref{CNN} with Table \ref{simple}, it is clear that the precision, recall and $F_1$ scores of the CNN are better than the simple NN except that the recall of \textit{Fear} is worse for CNN. After using the CNN, the classification rate improves nearly 14\%.\par
 \bigskip
-For the neural networks coursework, we only need to change the \textit{num\_classes} parameter to the new number of classes we have. As the number of output increases, we need to change the the parameters accordingly.
-This will automatically increase the dimensions of our softmax output vector. The entire neural net must be retrained.\par
-As we pre-process the training data using normalization: subtract the mean image, so the image mean will be changed as well.\par
-Since the new labels are added, the whole structure for neural network may will not be well fit for the classification, so we need to redesign its architecture and reconsider the problems of diagnostics, weight initialization, learning rate,
-activation functions, network topology, batches and epochs, regularization, optimization and loss and early stopping.
+This isn't surprising because in the CNN, we use data argumentation techniques, which generates transformed images to train the CNN. The learned weights will be more robust to various transformations and hence less likely to overfit.\par
+\bigskip
+Moreover, the convolution kernel helps to extract ``local'' properties of an image. After using a set of filters, the CNN will learn the most important pattern of images trained. In addition, the maxpool layers will downsample the outputs to reduce the size of representation, which will simplify the data and improve the accuracy. While, in NN, the pictures are read as input neurons, which contain many trivial pixels in data points, so the accuracy will be worse than the CNN.\par
 
-\section*{Question 6}
-
-\subsection*{Architecture of CNN}
-\begin{figure}[!htb]
-\centering
-\includegraphics[width=\textwidth]{cnn.png}
-\caption{Architecture of Convolutional Neural Network}
+\begin{figure} [!htb]
+    \centering
+    \includegraphics[width=\textwidth] {cnn.png}
+    \caption{Architecture of Convolutional Neural Network}
 \end{figure}
-
-\begin{table}
-\centering
-\begin{tabular} { >{\centering\arraybackslash}m{4cm} | m{12cm} }
-	\hline
-    Data Argumentation & 1. randomly rotate images 45 degrees\par
-    2. randomly(25\%) shift images horizontally and images vertically\par
-    3. randomly flip images horizontal and vertically \\ \hline
-    
-    Convolution2D & 2 convolutional layers of 32 kernels with size of 3x3\par
-    using ReLU as activation \\ \hline
-    
-    Optimization & 2x2 Maxpool Layer\par
-    (and dropout with probability 0.25) \\ \hline
-    
-    Convolution2D & 2 convolutional layers of 64 kernels with size of 3x3\par
-    using ReLU as activation \\ \hline
-    
-    Optimization & 2x2 Maxpool Layer\par
-    (and dropout with probability 0.25) \\ \hline
-    
-    Full Connected Network & 512 neurons\par
-    activation: ReLU\par
-    Dropout with probability 0.5\par
-    activation: Softmax \\
-    \hline
-\end{tabular}
-\caption{CNN Architecture Parameters}
-\end{table}
-
-Batch size : 32; Number of epochs : 150
-\subsection*{Performance}
-\begin{table}
-\begin{center}
-\begin{tabular} { C{2.7cm} | C{1.5cm} C{1.5cm} C{1.3cm} C{1.7cm} C{1.5cm} C{1.5cm} C{1.5cm} }
-    \multirow{2}{*}{Actual Class} & \multicolumn{7}{c}{Predicted Class} \\
-    & Anger & Disgust & Fear & Happiness & Sadness & Surprise & Neutral \\ \hline
-    Anger     & 219 & 1 & 21 &  47 &  76 &  18 &  85 \\
-    Disgust   &  26 & 0 &  4 &   7 &  12 &   1 &   6 \\
-    Fear      &  75 & 0 & 62 &  50 & 136 &  70 & 103 \\
-    Happiness &  40 & 0 &  7 & 730 &  34 &  18 &  66 \\
-    Sadness   &  93 & 0 & 26 &  73 & 273 &  17 & 171 \\
-    Surprise  &  18 & 0 & 32 &  29 &  13 & 303 &  20 \\
-    Neutral   &  57 & 0 & 11 &  72 &  91 &  12 & 364
-\end{tabular}
-\end{center}
-\caption{Confusion matrix based on test data}\label{cm_cnn}
-\end{table}
-Summary statistics:
-\begin{table}
-\begin{center}
-\begin{tabular} { C{2.7cm} | C{1.5cm} C{1.5cm} C{1.3cm} C{1.7cm} C{1.5cm} C{1.5cm} C{1.5cm} }
-    & Anger & Disgust & Fear & Happiness & Sadness & Surprise & Neutral \\ \hline
-    Precision   & 0.415 &   0 & 0.380 & 0.724 & 0.430 & 0.690 & 0.447 \\
-    Recall      & 0.469 &   0 & 0.125 & 0.816 & 0.418 & 0.730 & 0.600 \\
-    $F_1$ score & 0.440 & NaN & 0.188 & 0.767 & 0.424 & 0.710 & 0.512
-\end{tabular}
-\end{center}
-\caption{Convolutional Neural Network Performance Using Test Data}\label{stat_cnn}
-\end{table}
-\[ \text{Classification rate} = \frac{219 + 0 + \dotsm + 364}{3500} = 0.54 \]
-
-\subsection{Comparison}
-Comparing the performance from Table \ref{stat_cnn} and Table \ref{stat_nn}, it is clearly seen that the precision rates, recall and F1 performance of the CNN are better than the feedforward NN except that the recall of fear is bad than NN. After using the CNN, the classification rate improves nearly 10\%.\par
-Because in the CNN, we use data argumentation techniques to create randomly modified versions of existing vectors and it has shown effective in image classification, and generate more training data for model.\par
-Also, CNN performs well in image classification. Using convolution to extract ¡°local¡± properties of the picture. After Using a set of ¡°filters¡±, the CNN will learn the most import pattern of images trained, just like the process of recognition in human brain. In addition, the use of Maxpool layers can downsample the outputs to reduce the size of representation, which will simplify the data and improve the accuracy. While, in NN, the pictures are read as input neurons, which contain many trivial pixels in data points, so the accuracy will be bad than the CNN.
 
 \end{document}
