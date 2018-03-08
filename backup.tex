@@ -45,31 +45,10 @@ Its derivative is 1 for $x > 0$ and 0 for $x < 0$. At $x = 0$, its derivative do
 \section*{Question 2}
 
 \subsection*{Training Phase}
-During training, the forward pass of inverted dropout will multiply the output of some neurons by 0, so it's effectively removing neurons. We set the proportion $p$ of neurons to dropout, and scale the outputs of the remaining neurons by $1/(1-p)$. The backward pass computes
-\[ \frac{\partial L}{\partial X} = \frac{\partial L}{\partial z} \frac{\partial z}{\partial X} =
-\frac{\partial L}{\partial z} \frac{\partial 
-\left \{
-  \begin{tabular}{ccc}
-  X$_i$$_j$\qquad \textit{if}  \textit{D}$_i$$_j$ = 1 \\
-  0 \qquad  \textit{ if} \textit{D}$_i$$_j$ = 0 \\
-  \end{tabular}
-\right \}
-}{\partial X} 
-= 
-\frac{\partial L}{\partial z} \frac{\partial 
-\left \{
-  \begin{tabular}{ccc}
-  1 \qquad \textit{if}  \textit{D}$_i$$_j$ = 1 \\
-  0 \qquad  \textit{if} \textit{D}$_i$$_j$ = 0 \\
-  \end{tabular}
-\right \}
-}{\partial X}
-= \frac{\partial L}{\partial z}\mathcal{D}
-\]
+During training, the forward pass of inverted dropout will multiply the output of some neurons by 0, so it's effectively removing neurons. We set the proportion $p$ of neurons to dropout, and scale the outputs of the remaining neurons by $1/(1-p)$.
 
 \subsection* {Testing Phase}
-During testing, we use all neurons in both forward and backward pass, as if they were never dropped out. The backward pass computes
-\[ \frac{\partial L}{\partial X} = \frac{\partial L}{\partial z} \ones \]
+During testing, we use all neurons in both forward and backward pass, as if they were never dropped out.
 
 \section*{Question 3}
 
@@ -103,9 +82,7 @@ Note that $y_{i,1} \, \delta_{1,k} + \dots + y_{i,C} \, \delta_{C,k}$ is 1 when 
 and subtracting 1 from the appropriate column.
 
 \section*{Question 4}
-\subsection*{Sanity Check}
-Once after the design of network, in order to check whether the network works or not, a small dataset was used to check if the network can reach overfitting and it can reach 50\% accuracy effortlessly on the validation set.
-\subsection*{Architecture}
+
 The shapes of our input and output neurons are $32 \times 32 \times 3$ and 10 respectively.\par
 \bigskip
 Our activation function is ReLU and optimization algorithm is Stochastic Gradient Descent.\par
@@ -145,38 +122,39 @@ Plots of loss function and classification accuracy are provided below.
 \section*{Question 5}
 
 \subsection*{Step 1: Architecture Design}
-A reasonable architecture to start with is: 2 hidden layers with about 512 and 128 neurons respectively, since 512 and 128 are between our input size ($48 \times 48 = 2304$ pixels) and output size (7 labels). This is a common rule of thumb; there is no consensus on what a good architecture is anyway.\par
+A reasonable architecture to start with is: 2 hidden layers with 512 and 128 neurons respectively, since 512 and 128 are between our input size ($48 \times 48 = 2304$ pixels) and output size (7 labels). This is a common rule of thumb; there is no consensus on what a good architecture is anyway.\par
 \bigskip
-We initialized the neural net's weights from a standard Normal distribution.\par
+We initialized the neural net's weights from a standard Normal distribution independently.\par
 \bigskip
-We used the default momentum rate of 0.9.\par
-\bigskip
-We used the default learning rate update schedule, which decays the learning rate by 0.95.\par
+We used the default momentum rate of 0.9 and the default learning rate update schedule, which decays the learning rate by 0.95.\par
 \bigskip
 For a start, we used the default ``stopping criterion'' in \texttt{solver.py} which is simply the number of iterations. We tried early stopping but it actually led to lower classification accuracy.\par
 \bigskip
 
 \subsection*{Step 2: Learning Rate}
-We plotted both training and validation classification accuracy (after 9000 iterations) for various learning rates, which range from $10^{-5}$ to $10^{-2}$ on a log scale.\par
+In Figure \ref{learn_rate}, we plotted both training and validation classification accuracy (after 9000 iterations) for various learning rates, which range from $10^{-5}$ to $10^{-2}$ on a log scale.\par
 \bigskip
 Why 9000 iterations? There are about 270 iterations per epoch and we trained our neural net for 35 epochs, for a total of 9450 iterations.\par
 \bigskip
-The optimal learning rate is the one with highest validation accuracy i.e. lowest asymptotic error. This turns out to be around $5 \times 10^{-4}$ and it results in a training accuracy of 72\% (error of 28\%) and a validation accuracy of 42\% (error of 58\%).
+The optimal learning rate is the one with highest validation accuracy i.e. lowest asymptotic error. This turns out to be around $5 \times 10^{-4}$ and it results in a training accuracy of 72\% (error of 28\%) and a validation accuracy of 42\% (error of 58\%).\par
+\bigskip
 
-\begin{figure} [!htb]
+\begin{figure} [h!]
     \begin{minipage}{\textwidth}
     \centering
     \includegraphics[width=\linewidth] {lr_compare.jpeg}
-    \caption{Different Learning Rates' Performance} \label{Fig:Data1}
+    \caption{Learning Rates} \label{learn_rate}
    \end{minipage} \hfill
 \end{figure}
 
 \subsection*{Step 3: Dropout}
-We dropped out various proportions of neurons and plotted the training and test accuracy:
+We dropped out various proportions of neurons and plotted the training and test accuracy in Figure \ref{dropout}.\par
+\bigskip
 
-\begin{figure}[!htb]
+\begin{figure} [h!]
     \centering
     \includegraphics[width=\linewidth]{dropout_compare.jpeg}
+    \caption{Dropout} \label{dropout}
 \end{figure}
 
 Dropout does not improve training and test accuracies. This suggests that our neural net might be underfitting, so we should probably increase the number of neurons.\par
@@ -187,7 +165,7 @@ We vary the L2 penalty rate $\lambda$ from 0 to 0.5 and plotted the training los
 \bigskip
 Just like dropout, L2 regularization does not improve validation accuracy i.e. it is maximized when $\lambda = 0$. This is consistent with our dropout finding that our neural net is underfitting.\par
 \bigskip
-Between dropout and regularization, we prefer the latter because it's more easily reproducible without access to our code. Dropout has an element of arbitrariness.\par
+Between dropout and regularization, we prefer the latter because it's more easily reproducible even without access to our code. Dropout has an element of arbitrariness.\par
 \bigskip
 
 \begin{figure} [h!]
@@ -266,29 +244,27 @@ For both learning algorithms, we need to retune all hyper-parameters by cross va
 
 We have trained a convolutional neural network (CNN) with batch size = 32, number of epochs = 150 and the following architecture:
 \begin{center}
-\begin{tabular} { C{4cm} | L{12cm} }
+\begin{tabular} { C{4cm} | L{11cm} }
     Data Argumentation & 1. Randomly rotate images 45 degrees\par
-    2. Randomly (25\%) shift images horizontally and images vertically\par
+    2. Randomly (25\%) shift images horizontally and vertically\par
     3. Randomly flip images horizontal and vertically \\ \hline
 
-    Convolution2D & 2 convolutional layers of 32 kernels with size of $3 \times 3$\par
-    using ReLU activation \\ \hline
+    Convolution2D & 2 convolutional layers of 32 kernels with size of $3 \times 3$ using ReLU activation \\ \hline
 
     Optimization & $2 \times 2$ Maxpool Layer\par
     (and dropout with probability 0.25) \\ \hline
 
-    Convolution2D & 2 convolutional layers of 64 kernels with size of 3x3\par
-    using ReLU activation \\ \hline
+    Convolution2D & 2 convolutional layers of 64 kernels with size of $3 \times 3$ using ReLU activation \\ \hline
 
-    Optimization & $2 \times 2$ Maxpool Layer\par
-    (and dropout with probability 0.25) \\ \hline
+    Optimization & $2 \times 2$ Maxpool Layer with dropout probability = 0.25 \\ \hline
 
-    Full Connected Network & 512 neurons\par
+    Fully Connected Network & 512 neurons\par
     Activation: ReLU\par
     Dropout with probability 0.5\par
     Activation: Softmax \\
 \end{tabular}
 \end{center}
+\bigskip
 
 Confusion matrix based on test data:\par
 \begin{center}
@@ -324,7 +300,7 @@ This isn't surprising because in the CNN, we use data argumentation techniques, 
 \bigskip
 Moreover, the convolution kernel helps to extract ``local'' properties of an image. After using a set of filters, the CNN will learn the most important pattern of images trained. In addition, the maxpool layers will downsample the outputs to reduce the size of representation, which will simplify the data and improve the accuracy. While, in NN, the pictures are read as input neurons, which contain many trivial pixels in data points, so the accuracy will be worse than the CNN.\par
 
-\begin{figure} [!htb]
+\begin{figure} [h!]
     \centering
     \includegraphics[width=\textwidth] {cnn.png}
     \caption{Architecture of Convolutional Neural Network}
