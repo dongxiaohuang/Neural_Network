@@ -37,6 +37,7 @@ plt.xlabel('Epoch')
 plt.legend(loc='lower right')
 plt.gcf().set_size_inches(15, 12)
 plt.show()
+plt.savefig('train_fcnet.png')
 
 ##############################################################################
 #                             END OF YOUR CODE                               #

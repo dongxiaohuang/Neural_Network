@@ -31,4 +31,6 @@ plt.plot([0.5]* len(solver.val_acc_history), 'k--')
 plt.xlabel('Epoch')
 plt.legend(loc='lower right')
 plt.gcf().set_size_inches(15, 12)
+
+plt.savefig('overfit_fcnet.png')
 plt.show()

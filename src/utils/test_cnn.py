@@ -3,7 +3,7 @@ from os import listdir
 from scipy.misc import imread
 from keras.models import load_model
 
-def test_deep_fer_model(img_folder, model= './utils/bestmodels/weights.23-1.20.hdf5'):
+def test_deep_fer_model(img_folder, model= './utils/bestmodels/weights.149-1.11.hdf5'):
 ###########################################load model#####################
     """
     Given a folder with images, load the images and your best model to predict
@@ -32,7 +32,7 @@ def test_deep_fer_model(img_folder, model= './utils/bestmodels/weights.23-1.20.h
 
     X_test = X_test.astype('float64')
     X_test -= mean_image
-    
+
     X_test /= np.max(X_test) # Normalise data to [0, 1] range
 
 
