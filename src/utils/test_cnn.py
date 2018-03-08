@@ -4,7 +4,7 @@ import pickle
 from scipy.misc import imread
 from keras.models import load_model
 
-def test_deep_fer_model(img_folder, model= './bestmodels/weights.149-1.11.hdf5'):
+def test_deep_fer_model(img_folder, model= './bestmodels/cnn_model.hdf5'):
 ###########################################load model#####################
     """
     Given a folder with images, load the images and your best model to predict

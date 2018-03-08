@@ -43,9 +43,9 @@ Return:
 The data normalization is also used in the training period, we include the pickle file <i>mean_image.pickle </i>. So when using the function `test_deep_fer_model`, the file should be read. In order to ensure the pickle is read functionally, the pickle file should be placed in the same directory of the file <i>test_cnn.py</i>
 and then in the same directory to run the code.
 
-for example: if we are in the directory <i>utils</i>, and the file <i>test_cnn, mean_image.pickle, bestmodels/weights.149-1.11.hdf5</i> are all inside the directory. and the images path is :'/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test', then in this directory <i>utils</i>, type the following code.
+for example: if we are in the directory <i>utils</i>, and the file <i>test_cnn, mean_image.pickle, bestmodels/cnn_model.hdf5</i> are all inside the directory. and the images path is :'/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test', then in this directory <i>utils</i>, type the following code.
 ```
 python
 from test_cnn import test_deep_fer_model
-y_predict = test_deep_fer_model('/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test', './bestmodels/weights.149-1.11.hdf5')
+y_predict = test_deep_fer_model('/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test', './bestmodels/cnn_model.hdf5')
 ```
