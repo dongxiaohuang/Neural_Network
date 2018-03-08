@@ -43,7 +43,7 @@ Args:
 Return:
   - preds: a numpy vector of size N with N being the number of images in img_folder
 
-The data normalization is also used in the training period, the mean of training images is stored in the pickle file <i>mean_image.pickle </i>. So when using the function `test_deep_fer_model`, the file must be read in the working directory.
+The data normalization is also used in the training period, the mean of training images is stored in the pickle file <i>mean_image.pickle </i>. So when using the function `test_deep_fer_model`, the file must be in the working directory.
 
 for example: if we are in the directory <i>utils</i>, and the file <i>test_cnn, mean_image.pickle, cnn_model.hdf5</i> are all inside the directory, the images path is :'/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test', in the directory <i>utils</i>, type the following code:
 
