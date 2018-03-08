@@ -1,11 +1,10 @@
 import numpy as np
-
-from src.fcnet import FullyConnectedNet
-from src.utils.solver import Solver
-from src.utils.data_utils import get_FER2013_data
+import matplotlib.pyplot as plt
 import pickle
+from os import listdir
+from scipy.misc import imread
 
-def test_fer_model(img_folder, model="/src/utils/model.pickle"):
+def test_fer_model(img_folder, model="model.pickle"):
     """
     Given a folder with images, load the images and your best model to predict
     the facial expression of each image.
@@ -18,43 +17,28 @@ def test_fer_model(img_folder, model="/src/utils/model.pickle"):
     preds = None
     ### Start your code here
 
-    #X, y = load_image(img_folder)
-
     f = open(model, 'rb')
     fcn_model = pickle.load(f)
     f.close()
+    f = open('mean.pickle', 'rb')
+    mean = pickle.load(f)
+    f.close()
 
-    #preds = solver.check_accuracy(X, y)
+    X = []
+    print("loading data...")
+    for f in listdir(img_folder):
+        fig_dir = img_folder +'/'+ f
+        fig = imread(name = fig_dir, mode = 'L').reshape(48,48,1)
+        X.append(fig)
+    print("Loading finished!")
+
+    X = np.array(X).astype(np.float32)
+    X -= mean
+    X = X.transpose(0, 3, 1, 2).copy()
+
+    preds = np.argmax(fcn_model.loss(X), axis=1)
 
     ### End of code
     return preds
 
-model = FullyConnectedNet([512, 128], input_dim=48*48*1, num_classes=7,\
-                          dropout=0.5, dtype=np.float32, reg = 10)
-#f = open('model.pickle', 'rb')
-#model = pickle.load(f)
-#f.close()
-
-data = get_FER2013_data()
-solver = Solver(model, data,
-            update_rule='sgd_momentum',
-            optim_config={
-                'learning_rate': 1e-3,
-            },
-            lr_decay=0.95,
-            num_epochs=100, batch_size=100,
-            print_every=200)
-solver.train()
-
-#f = open('model.pickle', 'wb')
-#pickle.dump(model, f)
-#f.close()
-
-#acc, pre = solver.check_accuracy(data['X_test'], data['y_test'])
-#print("acc: ", acc)
-
-#n = np.unique(data['y_test']).shape[0]
-#matrix = np.zeros((n,n), int)
-#for i in range(data['y_test'].shape[0]):
-#    matrix[pre[i]][data['y_test'][i]] += 1
-#print(matrix)
+print (test_fer_model('/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test'))

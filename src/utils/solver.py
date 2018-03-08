@@ -298,13 +298,19 @@ class Solver(object):
                 if self.verbose:
                     print('(Epoch %d / %d) train acc: %f; val_acc: %f' % (
                            self.epoch, self.num_epochs, train_acc, val_acc))
-
+                
                 # Keep track of the best model
                 if val_acc > self.best_val_acc:
                     self.best_val_acc = val_acc
                     self.best_params = {}
                     for k, v in self.model.params.items():
                         self.best_params[k] = v.copy()
+        
+                """if(len(self.val_acc_history) > 3):
+                    if((self.val_acc_history[-1] < self.val_acc_history[-2]) 
+                            & (self.val_acc_history[-2] < self.val_acc_history[-3])):
+                        print("Stopping")
+                        break"""
 
         # At the end of training swap the best params into the model
         self.model.params = self.best_params
