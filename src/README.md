@@ -1,23 +1,23 @@
 # To Test Model for Q5
-Files <i>test.py</i>, <i>model.pickle</i>, and <i>mean.pickle</i> are required in the working directory. The model is stored in file <i>model.pickle</i>.
+Files <i>test.py</i>, <i>model.pkl</i>, <i>mean.pkl</i>, and <i>src</i> are required in the working directory. The model is stored in file <i>model.pkl</i>.
 
 To test the model, import <i>test.py</i> as:
 ```
 import numpy as np
 from test import test_fer_model
-preds = test_fer_model(img_folder, 'model.pickle')
+preds = test_fer_model(img_folder, 'model.pkl')
 ```
 Args:
-  - img_folder: path to the test images
-  - model: path to the model
+  - img_folder: Path to the test images
+  - model: Path to the model
 
 Return:
-  - preds: a numpy vector of size N with N being the number of images in img_folder
+  - preds: A numpy vector of size N with N being the number of images in img_folder
 
-As the data normalization is used in training stage, the mean of training images must be loaded in order to get correct predictions. The mean of training images is stored in the file <i>mean.pickle</i>, put the file in the same directory where you run your program.
+As the data normalization is used in training stage, the mean of training images must be loaded in order to get correct predictions. The mean of training images is stored in the file <i>mean.pkl</i>, put the file in the same directory where you run your program.
 
 # To Test Model for Q6
-Files <i>test_cnn.py</i>, <i>cnn_model.hdf5</i>, and <i>mean_image.pickle</i> are required in the working directory. Install python models and run in python 3.
+Files <i>test_cnn.py</i>, <i>cnn_model.hdf5</i>, and <i>mean_image.pkl</i> are required in the working directory. Install python models and run in python 3.
 
 ## Dependencies
 - install pillow:
@@ -45,7 +45,7 @@ Return:
 
 The data normalization is also used in the training period, the mean of training images is stored in the pickle file <i>mean_image.pickle </i>. So when using the function `test_deep_fer_model`, the file must be in the working directory.
 
-for example: if we are in the directory <i>utils</i>, and the file <i>test_cnn, mean_image.pickle, cnn_model.hdf5</i> are all inside the directory, the images path is :'/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test', in the directory <i>utils</i>, type the following code:
+for example: if we are in the directory <i>utils</i>, and the file <i>test_cnn, mean_image.pkl, cnn_model.hdf5</i> are all inside the directory, the images path is :'/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test', in the directory <i>utils</i>, type the following code:
 
 ```
 from test_cnn import test_deep_fer_model
