@@ -4,7 +4,7 @@ import pickle
 from scipy.misc import imread
 from keras.models import load_model
 
-def test_deep_fer_model(img_folder, model= './utils/bestmodels/weights.149-1.11.hdf5'):
+def test_deep_fer_model(img_folder, model= './bestmodels/weights.149-1.11.hdf5'):
 ###########################################load model#####################
     """
     Given a folder with images, load the images and your best model to predict
@@ -28,10 +28,10 @@ def test_deep_fer_model(img_folder, model= './utils/bestmodels/weights.149-1.11.
     print("Loading finished!")
     X_test = np.array(X_test)
 
-    with open('./utils/mean_image.pickle', 'rb') as handle:
+    with open('./mean_image.pickle', 'rb') as handle:
         mean_image = pickle.load(handle)
 
-    X_test = X_test.astype('float64')
+    X_test = X_test.astype(np.float64)
     X_test -= mean_image
 
     X_test /= np.max(X_test) # Normalise data to [0, 1] range
@@ -44,4 +44,4 @@ def test_deep_fer_model(img_folder, model= './utils/bestmodels/weights.149-1.11.
     ### End of code
     return preds
 
-print (test_deep_fer_model('/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test'))
+# print (test_deep_fer_model('/vol/bitbucket/395ML_NN_Data/datasets/FER2013/Test'))
