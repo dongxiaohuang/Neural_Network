@@ -1,10 +1,9 @@
 # To Test Model for Q5
-Files <i>test.py</i>, <i>model.pkl</i>, <i>mean.pkl</i>, and <i>src</i> are required in the working directory. The model is stored in file <i>model.pkl</i>.
+Files <i>test_fcn.py</i>, <i>model.pkl</i>, <i>mean.pkl</i>, and <i>src</i> are required in the working directory. The model is stored in file <i>model.pkl</i>.
 
-To test the model, import <i>test.py</i> as:
+To test the model, import <i>test_fcn.py</i> as:
 ```
-import numpy as np
-from test import test_fer_model
+from test_fcn import test_fer_model
 preds = test_fer_model(img_folder, 'model.pkl')
 ```
 Args:
