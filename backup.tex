@@ -139,7 +139,7 @@ Why 9000 iterations? There are about 270 iterations per epoch and we trained our
 The optimal learning rate is the one with highest validation accuracy i.e. lowest asymptotic error. This turns out to be around $5 \times 10^{-4}$ and it results in a training accuracy of 72\% (error of 28\%) and a validation accuracy of 42\% (error of 58\%).\par
 \bigskip
 
-\begin{figure} [h!]
+\begin{figure} [p]
     \begin{minipage}{\textwidth}
     \centering
     \includegraphics[width=\linewidth] {lr_compare.jpeg}
@@ -151,7 +151,7 @@ The optimal learning rate is the one with highest validation accuracy i.e. lowes
 We dropped out various proportions of neurons and plotted the training and test accuracy in Figure \ref{dropout}.\par
 \bigskip
 
-\begin{figure} [h!]
+\begin{figure} [p]
     \centering
     \includegraphics[width=\linewidth]{dropout_compare.jpeg}
     \caption{Dropout} \label{dropout}
@@ -294,16 +294,18 @@ Summary statistics:
 \end{table}
 \end{center}
 
-Comparing Table \ref{CNN} with Table \ref{simple}, it is clear that the precision, recall and $F_1$ scores of the CNN are better than the simple NN except that the recall of \textit{Fear} is worse for CNN. After using the CNN, the classification rate improves nearly 14\%.\par
+Comparing Table \ref{CNN} with Table \ref{simple}, it is clear that the precision, recall and $F_1$ scores of the CNN are better than the simple NN except that the recall of \textit{Fear} is worse for CNN. Classification rate of CNN is about 12\% higher.\par
 \bigskip
 This isn't surprising because in the CNN, we use data argumentation techniques, which generates transformed images to train the CNN. The learned weights will be more robust to various transformations and hence less likely to overfit.\par
 \bigskip
-Moreover, the convolution kernel helps to extract ``local'' properties of an image. After using a set of filters, the CNN will learn the most important pattern of images trained. In addition, the maxpool layers will downsample the outputs to reduce the size of representation, which will simplify the data and improve the accuracy. While, in NN, the pictures are read as input neurons, which contain many trivial pixels in data points, so the accuracy will be worse than the CNN.\par
+Moreover, the convolution kernel helps to extract ``local'' properties of an image. In addition, the maxpool layers will downsample the images while increasing their contrast, which enables the CNN to learn the essential features of an image. On the other hand, a simple NN will reshape a 2D image into 1D vector, which destroys the structure of the image.\par
 
 \begin{figure} [h!]
     \centering
     \includegraphics[width=\textwidth] {cnn.png}
     \caption{Architecture of Convolutional Neural Network}
 \end{figure}
+
+\section*{References}
 
 \end{document}
