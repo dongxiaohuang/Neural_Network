@@ -8,11 +8,11 @@ from test import test_fer_model
 preds = test_fer_model(img_folder, 'model.pickle')
 ```
 Args:
-	- img_folder: path to the test images
-	- model: path to the model
+  - img_folder: path to the test images
+  - model: path to the model
 
 Return:
-	- preds: A numpy vector of size N with N being the number of images in img_folder
+  - preds: A numpy vector of size N with N being the number of images in img_folder
 
 As the data normalization is used in training stage, the mean of training images must be loaded in order to get correct predictions. The mean of training images is stored in the file <i>mean.pickle</i>, put the file in the same directory where you run your program.
 
